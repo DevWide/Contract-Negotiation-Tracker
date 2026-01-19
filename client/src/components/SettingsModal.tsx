@@ -1,0 +1,529 @@
+// Contract Negotiation Tracker - SettingsModal Component
+// Design: Refined Legal Elegance - Unified settings for columns, templates, categories, data management
+
+import { useState } from 'react';
+import { useNegotiation } from '@/contexts/NegotiationContext';
+import { useEscapeKey } from '@/hooks/useKeyboardShortcuts';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Switch } from '@/components/ui/switch';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
+import { 
+  Columns, 
+  FileText, 
+  Database, 
+  Trash2, 
+  RotateCcw,
+  Download,
+  Plus,
+  GripVertical,
+  Tags,
+  ChevronDown,
+  X,
+  Pencil,
+  Upload
+} from 'lucide-react';
+import { exportAllDataToJSON, downloadFile } from '@/lib/exportUtils';
+import { EditTemplateDialog } from '@/components/EditTemplateDialog';
+import { ImportTemplateDialog } from '@/components/ImportTemplateDialog';
+import type { Template } from '@/types';
+
+interface SettingsModalProps {
+  open: boolean;
+  onClose: () => void;
+}
+
+export function SettingsModal({ open, onClose }: SettingsModalProps) {
+  const { 
+    columns,
+    toggleColumn,
+    resetColumns,
+    addCustomColumn,
+    templates,
+    createTemplate,
+    deleteTemplate,
+    updateTemplate,
+    addClauseToTemplate,
+    updateTemplateClause,
+    deleteTemplateClause,
+    contracts,
+    clearAllData,
+    resetToSampleData,
+    impactCategories,
+    addImpactCategory,
+    deleteImpactCategory,
+    addSubcategory,
+    removeSubcategory,
+    resetImpactCategories,
+  } = useNegotiation();
+
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [newColumnName, setNewColumnName] = useState('');
+  const [newTemplateName, setNewTemplateName] = useState('');
+  const [newTemplateDesc, setNewTemplateDesc] = useState('');
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [newSubcategories, setNewSubcategories] = useState<Record<string, string>>({});
+  const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
+  const [editingTemplate, setEditingTemplate] = useState<Template | null>(null);
+  const [showImportDialog, setShowImportDialog] = useState(false);
+
+  useEscapeKey(onClose, open);
+
+  const handleAddColumn = () => {
+    if (!newColumnName.trim()) return;
+    addCustomColumn(newColumnName.trim());
+    setNewColumnName('');
+  };
+
+  const handleCreateTemplate = () => {
+    if (!newTemplateName.trim()) return;
+    createTemplate({
+      name: newTemplateName.trim(),
+      description: newTemplateDesc.trim(),
+    });
+    setNewTemplateName('');
+    setNewTemplateDesc('');
+  };
+
+  const handleAddCategory = () => {
+    if (!newCategoryName.trim()) return;
+    addImpactCategory(newCategoryName.trim(), []);
+    setNewCategoryName('');
+  };
+
+  const handleAddSubcategory = (categoryId: string) => {
+    const subcategoryName = newSubcategories[categoryId]?.trim();
+    if (!subcategoryName) return;
+    addSubcategory(categoryId, subcategoryName);
+    setNewSubcategories(prev => ({ ...prev, [categoryId]: '' }));
+  };
+
+  const toggleCategoryExpanded = (categoryId: string) => {
+    setExpandedCategories(prev => 
+      prev.includes(categoryId) 
+        ? prev.filter(id => id !== categoryId)
+        : [...prev, categoryId]
+    );
+  };
+
+  const handleExportAll = () => {
+    const json = exportAllDataToJSON(contracts, templates);
+    downloadFile(json, `negotiation-tracker-backup-${new Date().toISOString().slice(0, 10)}.json`, 'application/json');
+  };
+
+  const handleClearData = () => {
+    clearAllData();
+    setShowClearConfirm(false);
+  };
+
+  return (
+    <>
+      <Dialog open={open} onOpenChange={onClose}>
+        <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="font-serif text-xl">Settings</DialogTitle>
+          </DialogHeader>
+
+          <Tabs defaultValue="columns" className="flex-1 flex flex-col min-h-0">
+            <TabsList className="flex-shrink-0">
+              <TabsTrigger value="columns" className="flex items-center gap-1">
+                <Columns className="w-3.5 h-3.5" />
+                Columns
+              </TabsTrigger>
+              <TabsTrigger value="categories" className="flex items-center gap-1">
+                <Tags className="w-3.5 h-3.5" />
+                Categories
+              </TabsTrigger>
+              <TabsTrigger value="templates" className="flex items-center gap-1">
+                <FileText className="w-3.5 h-3.5" />
+                Templates
+              </TabsTrigger>
+              <TabsTrigger value="data" className="flex items-center gap-1">
+                <Database className="w-3.5 h-3.5" />
+                Data
+              </TabsTrigger>
+            </TabsList>
+
+            {/* Columns Tab */}
+            <TabsContent value="columns" className="flex-1 min-h-0 mt-4">
+              <ScrollArea className="h-[400px]">
+                <div className="space-y-4 pr-4">
+                  <p className="text-sm text-muted-foreground">
+                    Show or hide columns in the clause table. Drag to reorder.
+                  </p>
+
+                  <div className="space-y-2">
+                    {columns
+                      .sort((a, b) => a.order - b.order)
+                      .map(column => (
+                        <div 
+                          key={column.id}
+                          className="flex items-center justify-between p-3 border rounded-lg"
+                        >
+                          <div className="flex items-center gap-3">
+                            <GripVertical className="w-4 h-4 text-muted-foreground cursor-grab" />
+                            <span className="font-medium">{column.label}</span>
+                            {column.id.startsWith('custom-') && (
+                              <span className="text-xs text-muted-foreground">(Custom)</span>
+                            )}
+                          </div>
+                          <Switch
+                            checked={column.visible}
+                            onCheckedChange={() => toggleColumn(column.id)}
+                          />
+                        </div>
+                      ))}
+                  </div>
+
+                  <div className="pt-4 border-t">
+                    <Label className="text-sm font-medium">Add Custom Column</Label>
+                    <div className="flex items-center gap-2 mt-2">
+                      <Input
+                        placeholder="Column name"
+                        value={newColumnName}
+                        onChange={e => setNewColumnName(e.target.value)}
+                        onKeyDown={e => e.key === 'Enter' && handleAddColumn()}
+                      />
+                      <Button onClick={handleAddColumn} disabled={!newColumnName.trim()}>
+                        <Plus className="w-4 h-4 mr-1" />
+                        Add
+                      </Button>
+                    </div>
+                  </div>
+
+                  <Button variant="outline" onClick={resetColumns} className="w-full">
+                    <RotateCcw className="w-4 h-4 mr-2" />
+                    Reset to Default
+                  </Button>
+                </div>
+              </ScrollArea>
+            </TabsContent>
+
+            {/* Categories Tab */}
+            <TabsContent value="categories" className="flex-1 min-h-0 mt-4">
+              <ScrollArea className="h-[400px]">
+                <div className="space-y-4 pr-4">
+                  <p className="text-sm text-muted-foreground">
+                    Manage impact categories and their subcategories for clause classification.
+                  </p>
+
+                  <div className="space-y-2">
+                    {impactCategories.map(category => (
+                      <Collapsible 
+                        key={category.id}
+                        open={expandedCategories.includes(category.id)}
+                        onOpenChange={() => toggleCategoryExpanded(category.id)}
+                      >
+                        <div className="border rounded-lg">
+                          <CollapsibleTrigger asChild>
+                            <div className="flex items-center justify-between p-3 cursor-pointer hover:bg-muted/50 transition-colors">
+                              <div className="flex items-center gap-2">
+                                <ChevronDown className={`w-4 h-4 transition-transform ${expandedCategories.includes(category.id) ? '' : '-rotate-90'}`} />
+                                <span className="font-medium">{category.name}</span>
+                                <span className="text-xs text-muted-foreground">
+                                  ({category.subcategories.length} subcategories)
+                                </span>
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  deleteImpactCategory(category.id);
+                                }}
+                                className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </CollapsibleTrigger>
+                          <CollapsibleContent>
+                            <div className="px-3 pb-3 pt-1 border-t bg-muted/30">
+                              <div className="space-y-2">
+                                {category.subcategories.map(sub => (
+                                  <div 
+                                    key={sub}
+                                    className="flex items-center justify-between py-1.5 px-2 bg-background rounded"
+                                  >
+                                    <span className="text-sm">{sub}</span>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      onClick={() => removeSubcategory(category.id, sub)}
+                                      className="h-6 w-6 text-muted-foreground hover:text-destructive"
+                                    >
+                                      <X className="w-3 h-3" />
+                                    </Button>
+                                  </div>
+                                ))}
+                                {category.subcategories.length === 0 && (
+                                  <p className="text-xs text-muted-foreground py-2">
+                                    No subcategories yet
+                                  </p>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-2 mt-3">
+                                <Input
+                                  placeholder="Add subcategory..."
+                                  value={newSubcategories[category.id] || ''}
+                                  onChange={e => setNewSubcategories(prev => ({ 
+                                    ...prev, 
+                                    [category.id]: e.target.value 
+                                  }))}
+                                  onKeyDown={e => e.key === 'Enter' && handleAddSubcategory(category.id)}
+                                  className="h-8 text-sm"
+                                />
+                                <Button 
+                                  size="sm"
+                                  onClick={() => handleAddSubcategory(category.id)}
+                                  disabled={!newSubcategories[category.id]?.trim()}
+                                >
+                                  <Plus className="w-3 h-3" />
+                                </Button>
+                              </div>
+                            </div>
+                          </CollapsibleContent>
+                        </div>
+                      </Collapsible>
+                    ))}
+                  </div>
+
+                  <div className="pt-4 border-t">
+                    <Label className="text-sm font-medium">Add New Category</Label>
+                    <div className="flex items-center gap-2 mt-2">
+                      <Input
+                        placeholder="Category name"
+                        value={newCategoryName}
+                        onChange={e => setNewCategoryName(e.target.value)}
+                        onKeyDown={e => e.key === 'Enter' && handleAddCategory()}
+                      />
+                      <Button onClick={handleAddCategory} disabled={!newCategoryName.trim()}>
+                        <Plus className="w-4 h-4 mr-1" />
+                        Add
+                      </Button>
+                    </div>
+                  </div>
+
+                  <Button variant="outline" onClick={resetImpactCategories} className="w-full">
+                    <RotateCcw className="w-4 h-4 mr-2" />
+                    Reset to Default
+                  </Button>
+                </div>
+              </ScrollArea>
+            </TabsContent>
+
+            {/* Templates Tab */}
+            <TabsContent value="templates" className="flex-1 min-h-0 mt-4">
+              <ScrollArea className="h-[400px]">
+                <div className="space-y-4 pr-4">
+                  <p className="text-sm text-muted-foreground">
+                    Create reusable templates with pre-defined clauses for new contracts.
+                  </p>
+
+                  {templates.length > 0 && (
+                    <div className="space-y-2">
+                      {templates.map(template => (
+                        <div 
+                          key={template.id}
+                          className="flex items-center justify-between p-3 border rounded-lg"
+                        >
+                          <div>
+                            <h4 className="font-medium">{template.name}</h4>
+                            <p className="text-sm text-muted-foreground">
+                              {template.clauses.length} clauses
+                              {template.description && ` • ${template.description}`}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => setEditingTemplate(template)}
+                              className="text-muted-foreground hover:text-foreground"
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => deleteTemplate(template.id)}
+                              className="text-muted-foreground hover:text-destructive"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="pt-4 border-t space-y-3">
+                    <Label className="text-sm font-medium">Create New Template</Label>
+                    <Input
+                      placeholder="Template name"
+                      value={newTemplateName}
+                      onChange={e => setNewTemplateName(e.target.value)}
+                    />
+                    <Textarea
+                      placeholder="Description (optional)"
+                      value={newTemplateDesc}
+                      onChange={e => setNewTemplateDesc(e.target.value)}
+                      rows={2}
+                    />
+                    <div className="flex gap-2">
+                      <Button 
+                        onClick={handleCreateTemplate} 
+                        disabled={!newTemplateName.trim()}
+                        className="flex-1"
+                      >
+                        <Plus className="w-4 h-4 mr-2" />
+                        Create Template
+                      </Button>
+                      <Button 
+                        variant="outline"
+                        onClick={() => setShowImportDialog(true)}
+                        className="flex-1"
+                      >
+                        <Upload className="w-4 h-4 mr-2" />
+                        Import from File
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </ScrollArea>
+            </TabsContent>
+
+            {/* Data Tab */}
+            <TabsContent value="data" className="flex-1 min-h-0 mt-4">
+              <ScrollArea className="h-[400px]">
+                <div className="space-y-6 pr-4">
+                  <div>
+                    <h4 className="font-medium mb-2">Export Data</h4>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      Download all your contracts and data as a JSON backup file.
+                    </p>
+                    <Button variant="outline" onClick={handleExportAll}>
+                      <Download className="w-4 h-4 mr-2" />
+                      Export All Data
+                    </Button>
+                  </div>
+
+                  <div className="pt-4 border-t">
+                    <h4 className="font-medium mb-2">Reset Data</h4>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      Restore the sample contracts and data for demonstration purposes.
+                    </p>
+                    <Button variant="outline" onClick={resetToSampleData}>
+                      <RotateCcw className="w-4 h-4 mr-2" />
+                      Reset to Sample Data
+                    </Button>
+                  </div>
+
+                  <div className="pt-4 border-t">
+                    <h4 className="font-medium mb-2 text-destructive">Danger Zone</h4>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      Permanently delete all contracts, clauses, and settings. This cannot be undone.
+                    </p>
+                    <Button 
+                      variant="destructive" 
+                      onClick={() => setShowClearConfirm(true)}
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Clear All Data
+                    </Button>
+                  </div>
+
+                  <div className="pt-4 border-t">
+                    <h4 className="font-medium mb-2">Storage Info</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Data is stored locally in your browser's localStorage. 
+                      Export regularly to prevent data loss if you clear your browser cache.
+                    </p>
+                    <div className="mt-2 p-3 bg-muted/50 rounded-lg">
+                      <p className="text-sm">
+                        <span className="font-medium">{contracts.length}</span> contracts stored
+                      </p>
+                      <p className="text-sm">
+                        <span className="font-medium">{templates.length}</span> templates stored
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </ScrollArea>
+            </TabsContent>
+          </Tabs>
+        </DialogContent>
+      </Dialog>
+
+      {/* Clear Data Confirmation */}
+      <AlertDialog open={showClearConfirm} onOpenChange={setShowClearConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Clear All Data?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete all contracts, clauses, templates, and settings. 
+              This action cannot be undone. Consider exporting your data first.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleClearData}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Clear All Data
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Edit Template Dialog */}
+      <EditTemplateDialog
+        open={!!editingTemplate}
+        onOpenChange={(open) => !open && setEditingTemplate(null)}
+        template={editingTemplate}
+        onSave={updateTemplate}
+        onAddClause={addClauseToTemplate}
+        onUpdateClause={updateTemplateClause}
+        onDeleteClause={deleteTemplateClause}
+      />
+
+      {/* Import Template Dialog */}
+      <ImportTemplateDialog
+        open={showImportDialog}
+        onOpenChange={setShowImportDialog}
+        onImport={(templateData) => {
+          createTemplate({
+            name: templateData.name,
+            description: templateData.description,
+            clauses: templateData.clauses,
+          });
+        }}
+      />
+    </>
+  );
+}

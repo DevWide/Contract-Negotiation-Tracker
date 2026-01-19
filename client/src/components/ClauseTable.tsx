@@ -1,0 +1,687 @@
+// Contract Negotiation Tracker - ClauseTable Component
+// Design: Refined Legal Elegance - Main data table with full inline editing
+
+import { useState, useRef, useEffect } from 'react';
+import { useNegotiation } from '@/contexts/NegotiationContext';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { 
+  ArrowUpDown, 
+  MoreHorizontal, 
+  Eye, 
+  Edit, 
+  Trash2,
+  GitCompare,
+  ChevronUp,
+  ChevronDown,
+  Check,
+  X,
+  Pencil,
+  BookOpen,
+  Plus
+} from 'lucide-react';
+import type { ClauseItem, ClauseStatus, Priority, RiskLevel } from '@/types';
+
+interface ClauseTableProps {
+  onViewItem: (item: ClauseItem) => void;
+  onEditItem: (item: ClauseItem) => void;
+  onCompareItem: (item: ClauseItem) => void;
+  onDeleteItem: (item: ClauseItem) => void;
+  onViewPlaybook?: (item: ClauseItem) => void;
+}
+
+// Inline text editor component
+function InlineTextEditor({
+  value,
+  onSave,
+  multiline = false,
+  placeholder = '',
+  className = '',
+}: {
+  value: string;
+  onSave: (value: string) => void;
+  multiline?: boolean;
+  placeholder?: string;
+  className?: string;
+}) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editValue, setEditValue] = useState(value);
+  const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [isEditing]);
+
+  useEffect(() => {
+    setEditValue(value);
+  }, [value]);
+
+  const handleSave = () => {
+    onSave(editValue);
+    setIsEditing(false);
+  };
+
+  const handleCancel = () => {
+    setEditValue(value);
+    setIsEditing(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !multiline) {
+      e.preventDefault();
+      handleSave();
+    } else if (e.key === 'Enter' && multiline && e.metaKey) {
+      e.preventDefault();
+      handleSave();
+    } else if (e.key === 'Escape') {
+      handleCancel();
+    }
+  };
+
+  if (isEditing) {
+    if (multiline) {
+      return (
+        <div className="flex flex-col gap-1">
+          <Textarea
+            ref={inputRef as React.RefObject<HTMLTextAreaElement>}
+            value={editValue}
+            onChange={(e) => setEditValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+            onBlur={handleSave}
+            placeholder={placeholder}
+            className="min-h-[80px] text-sm resize-none"
+            rows={3}
+          />
+          <div className="flex gap-1 justify-end">
+            <Button size="sm" variant="ghost" className="h-6 px-2" onClick={handleCancel}>
+              <X className="w-3 h-3" />
+            </Button>
+            <Button size="sm" className="h-6 px-2" onClick={handleSave}>
+              <Check className="w-3 h-3" />
+            </Button>
+          </div>
+        </div>
+      );
+    }
+    return (
+      <div className="flex items-center gap-1">
+        <Input
+          ref={inputRef as React.RefObject<HTMLInputElement>}
+          value={editValue}
+          onChange={(e) => setEditValue(e.target.value)}
+          onKeyDown={handleKeyDown}
+          onBlur={handleSave}
+          placeholder={placeholder}
+          className="h-7 text-sm"
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div
+      onClick={() => setIsEditing(true)}
+      className={`group cursor-pointer rounded px-1 py-0.5 -mx-1 hover:bg-muted/70 transition-colors ${className}`}
+    >
+      <div className="flex items-center gap-1">
+        <span className={value ? '' : 'text-muted-foreground italic'}>
+          {value || placeholder || '—'}
+        </span>
+        <Pencil className="w-3 h-3 opacity-0 group-hover:opacity-50 transition-opacity flex-shrink-0" />
+      </div>
+    </div>
+  );
+}
+
+// Popover text editor for longer content
+function PopoverTextEditor({
+  value,
+  onSave,
+  label,
+  placeholder = '',
+  displayValue,
+}: {
+  value: string;
+  onSave: (value: string) => void;
+  label: string;
+  placeholder?: string;
+  displayValue?: React.ReactNode;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [editValue, setEditValue] = useState(value);
+
+  useEffect(() => {
+    setEditValue(value);
+  }, [value]);
+
+  const handleSave = () => {
+    onSave(editValue);
+    setIsOpen(false);
+  };
+
+  const handleCancel = () => {
+    setEditValue(value);
+    setIsOpen(false);
+  };
+
+  return (
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
+      <PopoverTrigger asChild>
+        <div className="group cursor-pointer rounded px-1 py-0.5 -mx-1 hover:bg-muted/70 transition-colors">
+          <div className="flex items-center gap-1">
+            {displayValue || (
+              <span className={value ? 'line-clamp-2' : 'text-muted-foreground italic'}>
+                {value || placeholder || '—'}
+              </span>
+            )}
+            <Pencil className="w-3 h-3 opacity-0 group-hover:opacity-50 transition-opacity flex-shrink-0" />
+          </div>
+        </div>
+      </PopoverTrigger>
+      <PopoverContent className="w-80" align="start">
+        <div className="space-y-3">
+          <h4 className="font-medium text-sm">{label}</h4>
+          <Textarea
+            value={editValue}
+            onChange={(e) => setEditValue(e.target.value)}
+            placeholder={placeholder}
+            className="min-h-[120px] text-sm"
+            rows={5}
+          />
+          <div className="flex justify-end gap-2">
+            <Button size="sm" variant="outline" onClick={handleCancel}>
+              Cancel
+            </Button>
+            <Button size="sm" onClick={handleSave}>
+              Save
+            </Button>
+          </div>
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+export function ClauseTable({ 
+  onViewItem, 
+  onEditItem, 
+  onCompareItem,
+  onDeleteItem,
+  onViewPlaybook
+}: ClauseTableProps) {
+  const { 
+    activeContract,
+    filteredItems, 
+    visibleColumns,
+    sortState,
+    setSortState,
+    updateClauseItem,
+    formOptions,
+    selectedItemId,
+    setSelectedItemId,
+    impactCategories,
+    addImpactCategory,
+    addSubcategory,
+    getSubcategories,
+  } = useNegotiation();
+
+  if (!activeContract) return null;
+
+  const handleSort = (column: string) => {
+    setSortState(prev => ({
+      column: column as any,
+      direction: prev.column === column && prev.direction === 'asc' ? 'desc' : 'asc',
+    }));
+  };
+
+  const handleFieldChange = (item: ClauseItem, field: keyof ClauseItem, value: any) => {
+    updateClauseItem(activeContract.id, item.id, { [field]: value });
+  };
+
+  const getStatusBadgeClass = (status: ClauseStatus) => {
+    switch (status) {
+      case 'Agreed': return 'status-agreed';
+      case 'In Discussion': return 'status-discussion';
+      case 'Blocked': return 'status-blocked';
+      case 'Escalated': return 'status-escalated';
+      case 'No Changes': return 'status-nochanges';
+      default: return '';
+    }
+  };
+
+  const getPriorityBadgeClass = (priority: Priority) => {
+    switch (priority) {
+      case 'High': return 'priority-high';
+      case 'Medium': return 'priority-medium';
+      case 'Low': return 'priority-low';
+      default: return '';
+    }
+  };
+
+  const getRiskBadgeClass = (risk: RiskLevel) => {
+    switch (risk) {
+      case 'critical': return 'bg-[oklch(0.92_0.08_15)] text-[oklch(0.35_0.14_15)] border-[oklch(0.80_0.10_15)]';
+      case 'high': return 'bg-[oklch(0.92_0.06_25)] text-[oklch(0.40_0.12_25)] border-[oklch(0.80_0.08_25)]';
+      case 'medium': return 'bg-[oklch(0.92_0.06_55)] text-[oklch(0.45_0.12_55)] border-[oklch(0.80_0.08_55)]';
+      case 'low': return 'bg-[oklch(0.92_0.06_145)] text-[oklch(0.35_0.10_145)] border-[oklch(0.80_0.08_145)]';
+      default: return '';
+    }
+  };
+
+  const SortIcon = ({ column }: { column: string }) => {
+    if (sortState.column !== column) {
+      return <ArrowUpDown className="w-4 h-4 ml-1 opacity-50" />;
+    }
+    return sortState.direction === 'asc' 
+      ? <ChevronUp className="w-4 h-4 ml-1" />
+      : <ChevronDown className="w-4 h-4 ml-1" />;
+  };
+
+  const renderCell = (item: ClauseItem, columnId: string) => {
+    switch (columnId) {
+      case 'clauseNumber':
+        return (
+          <InlineTextEditor
+            value={item.clauseNumber}
+            onSave={(value) => handleFieldChange(item, 'clauseNumber', value)}
+            placeholder="e.g., 5.1"
+            className="font-mono text-sm font-medium text-[oklch(0.25_0.05_250)]"
+          />
+        );
+      
+      case 'topic':
+        return (
+          <InlineTextEditor
+            value={item.topic}
+            onSave={(value) => handleFieldChange(item, 'topic', value)}
+            placeholder="Topic"
+            className="font-medium text-sm"
+          />
+        );
+      
+      case 'issue':
+        return (
+          <div className="max-w-[200px]">
+            <InlineTextEditor
+              value={item.issue}
+              onSave={(value) => handleFieldChange(item, 'issue', value)}
+              placeholder="Issue"
+              className="font-medium"
+            />
+            <PopoverTextEditor
+              value={item.proposedChange}
+              onSave={(value) => handleFieldChange(item, 'proposedChange', value)}
+              label="Edit Proposed Change"
+              placeholder="Enter proposed change..."
+              displayValue={
+                item.proposedChange ? (
+                  <p className="text-xs text-muted-foreground truncate mt-0.5 max-w-[180px]">
+                    {item.proposedChange}
+                  </p>
+                ) : (
+                  <p className="text-xs text-muted-foreground/50 italic mt-0.5">
+                    Add proposed change...
+                  </p>
+                )
+              }
+            />
+          </div>
+        );
+      
+      case 'status':
+        return (
+          <Select
+            value={item.status}
+            onValueChange={(value: ClauseStatus) => handleFieldChange(item, 'status', value)}
+          >
+            <SelectTrigger className="h-8 w-[130px] border-0 bg-transparent p-0">
+              <Badge variant="outline" className={`${getStatusBadgeClass(item.status)} cursor-pointer`}>
+                {item.status}
+              </Badge>
+            </SelectTrigger>
+            <SelectContent>
+              {formOptions.statuses.map(status => (
+                <SelectItem key={status} value={status}>
+                  <Badge variant="outline" className={getStatusBadgeClass(status)}>
+                    {status}
+                  </Badge>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        );
+      
+      case 'priority':
+        return (
+          <Select
+            value={item.priority}
+            onValueChange={(value: Priority) => handleFieldChange(item, 'priority', value)}
+          >
+            <SelectTrigger className="h-8 w-[100px] border-0 bg-transparent p-0">
+              <Badge variant="outline" className={`${getPriorityBadgeClass(item.priority)} cursor-pointer`}>
+                {item.priority}
+              </Badge>
+            </SelectTrigger>
+            <SelectContent>
+              {formOptions.priorities.map(priority => (
+                <SelectItem key={priority} value={priority}>
+                  <Badge variant="outline" className={getPriorityBadgeClass(priority)}>
+                    {priority}
+                  </Badge>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        );
+      
+      case 'owner':
+        return (
+          <Select
+            value={item.owner}
+            onValueChange={(value: string) => handleFieldChange(item, 'owner', value)}
+          >
+            <SelectTrigger className="h-8 w-[110px] text-sm">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {formOptions.owners.map(owner => (
+                <SelectItem key={owner} value={owner}>{owner}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        );
+      
+      case 'impactCategory':
+        return (
+          <div className="flex flex-col gap-1">
+            <Select
+              value={item.impactCategory}
+              onValueChange={(value: string) => {
+                if (value === '__add_new__') {
+                  const newCat = prompt('Enter new category name:');
+                  if (newCat && newCat.trim()) {
+                    addImpactCategory(newCat.trim());
+                    handleFieldChange(item, 'impactCategory', newCat.trim());
+                    handleFieldChange(item, 'impactSubcategory', '');
+                  }
+                } else {
+                  handleFieldChange(item, 'impactCategory', value);
+                  // Reset subcategory when category changes
+                  handleFieldChange(item, 'impactSubcategory', '');
+                }
+              }}
+            >
+              <SelectTrigger className="h-7 w-[120px] text-xs">
+                <SelectValue placeholder="Category" />
+              </SelectTrigger>
+              <SelectContent>
+                {impactCategories.map(cat => (
+                  <SelectItem key={cat.name} value={cat.name}>{cat.name}</SelectItem>
+                ))}
+                <SelectItem value="__add_new__" className="text-primary font-medium">
+                  <span className="flex items-center gap-1"><Plus className="w-3 h-3" /> Add New</span>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+            {item.impactCategory && (
+              <Select
+                value={item.impactSubcategory}
+                onValueChange={(value: string) => {
+                  if (value === '__add_new__') {
+                    const newSub = prompt('Enter new subcategory name:');
+                    if (newSub && newSub.trim()) {
+                      addSubcategory(item.impactCategory, newSub.trim());
+                      handleFieldChange(item, 'impactSubcategory', newSub.trim());
+                    }
+                  } else {
+                    handleFieldChange(item, 'impactSubcategory', value);
+                  }
+                }}
+              >
+                <SelectTrigger className="h-6 w-[120px] text-xs text-muted-foreground">
+                  <SelectValue placeholder="Subcategory" />
+                </SelectTrigger>
+                <SelectContent>
+                  {getSubcategories(item.impactCategory).map(sub => (
+                    <SelectItem key={sub} value={sub}>{sub}</SelectItem>
+                  ))}
+                  <SelectItem value="__add_new__" className="text-primary font-medium">
+                    <span className="flex items-center gap-1"><Plus className="w-3 h-3" /> Add New</span>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            )}
+          </div>
+        );
+      
+      case 'riskLevel':
+        return (
+          <Select
+            value={item.riskLevel}
+            onValueChange={(value: RiskLevel) => handleFieldChange(item, 'riskLevel', value)}
+          >
+            <SelectTrigger className="h-8 w-[100px] border-0 bg-transparent p-0">
+              <Badge variant="outline" className={`${getRiskBadgeClass(item.riskLevel)} cursor-pointer`}>
+                {item.riskLevel.charAt(0).toUpperCase() + item.riskLevel.slice(1)}
+              </Badge>
+            </SelectTrigger>
+            <SelectContent>
+              {formOptions.riskLevels.map(risk => (
+                <SelectItem key={risk} value={risk}>
+                  <Badge variant="outline" className={getRiskBadgeClass(risk)}>
+                    {risk.charAt(0).toUpperCase() + risk.slice(1)}
+                  </Badge>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        );
+      
+      case 'clauseText':
+        return (
+          <PopoverTextEditor
+            value={item.clauseText}
+            onSave={(value) => handleFieldChange(item, 'clauseText', value)}
+            label="Edit Clause Text"
+            placeholder="Enter clause text..."
+            displayValue={
+              <p className="text-sm text-muted-foreground line-clamp-2 max-w-[250px]">
+                {item.clauseText || <span className="italic">No text</span>}
+              </p>
+            }
+          />
+        );
+      
+      case 'counterProposal':
+        return (
+          <PopoverTextEditor
+            value={item.counterProposal}
+            onSave={(value) => handleFieldChange(item, 'counterProposal', value)}
+            label="Edit Counter-Proposal Summary"
+            placeholder="Brief summary of counter-proposal..."
+            displayValue={
+              <p className="text-sm text-muted-foreground line-clamp-2 max-w-[200px]">
+                {item.counterProposal || <span className="italic">—</span>}
+              </p>
+            }
+          />
+        );
+      
+      case 'counterproposalWording':
+        return (
+          <PopoverTextEditor
+            value={item.counterproposalWording}
+            onSave={(value) => handleFieldChange(item, 'counterproposalWording', value)}
+            label="Edit Counter-Proposal Wording"
+            placeholder="Enter proposed alternative wording..."
+            displayValue={
+              <p className="text-sm text-muted-foreground line-clamp-2 max-w-[250px]">
+                {item.counterproposalWording || <span className="italic">—</span>}
+              </p>
+            }
+          />
+        );
+      
+      case 'proposedChange':
+        return (
+          <PopoverTextEditor
+            value={item.proposedChange}
+            onSave={(value) => handleFieldChange(item, 'proposedChange', value)}
+            label="Edit Proposed Change"
+            placeholder="Enter proposed change..."
+            displayValue={
+              <p className="text-sm text-muted-foreground line-clamp-2 max-w-[200px]">
+                {item.proposedChange || <span className="italic">—</span>}
+              </p>
+            }
+          />
+        );
+      
+      default:
+        return null;
+    }
+  };
+
+  if (filteredItems.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 text-center">
+        <img 
+          src="/images/empty-state.jpg" 
+          alt="No clauses" 
+          className="w-32 h-32 object-cover rounded-lg mb-4 opacity-80"
+        />
+        <h3 className="font-serif text-lg font-medium mb-1">No clauses found</h3>
+        <p className="text-sm text-muted-foreground max-w-sm">
+          {activeContract.items.length === 0 
+            ? 'Add your first clause to start tracking negotiations.'
+            : 'Try adjusting your filters to see more results.'}
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="border rounded-lg overflow-hidden bg-card">
+      <div className="overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-muted/50">
+              {visibleColumns.map(column => (
+                <TableHead 
+                  key={column.id}
+                  className="whitespace-nowrap"
+                  style={{ width: column.width }}
+                >
+                  <button
+                    onClick={() => handleSort(column.id)}
+                    className="flex items-center hover:text-foreground transition-colors"
+                  >
+                    {column.label}
+                    <SortIcon column={column.id} />
+                  </button>
+                </TableHead>
+              ))}
+              <TableHead className="w-[80px]">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredItems.map(item => (
+              <TableRow 
+                key={item.id}
+                className={`transition-colors ${
+                  selectedItemId === item.id ? 'bg-accent' : 'hover:bg-muted/50'
+                }`}
+                onClick={(e) => {
+                  // Only select if clicking on the row itself, not on interactive elements
+                  if ((e.target as HTMLElement).closest('button, select, input, textarea, [role="combobox"]')) {
+                    return;
+                  }
+                  setSelectedItemId(item.id);
+                }}
+              >
+                {visibleColumns.map(column => (
+                  <TableCell key={column.id} className="py-3 align-top">
+                    {renderCell(item, column.id)}
+                  </TableCell>
+                ))}
+                <TableCell className="align-top">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <MoreHorizontal className="w-4 h-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => onViewItem(item)}>
+                        <Eye className="w-4 h-4 mr-2" />
+                        View Details
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => onCompareItem(item)}>
+                        <GitCompare className="w-4 h-4 mr-2" />
+                        Compare Text
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => onEditItem(item)}>
+                        <Edit className="w-4 h-4 mr-2" />
+                        Edit All Fields
+                      </DropdownMenuItem>
+                      {onViewPlaybook && (
+                        <DropdownMenuItem onClick={() => onViewPlaybook(item)}>
+                          <BookOpen className="w-4 h-4 mr-2" />
+                          View Playbook
+                        </DropdownMenuItem>
+                      )}
+                      <DropdownMenuItem 
+                        onClick={() => onDeleteItem(item)}
+                        className="text-destructive focus:text-destructive"
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+      
+      {/* Inline editing hint */}
+      <div className="px-4 py-2 bg-muted/30 border-t text-xs text-muted-foreground flex items-center gap-2">
+        <Pencil className="w-3 h-3" />
+        <span>Click on any cell to edit inline. Press Enter to save, Escape to cancel.</span>
+      </div>
+    </div>
+  );
+}

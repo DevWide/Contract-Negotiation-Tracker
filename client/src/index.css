@@ -1,0 +1,276 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* 
+ * DESIGN SYSTEM: Refined Legal Elegance
+ * - Primary: Deep navy (#0f2942) - traditional legal authority
+ * - Accent: Antique gold (#b8860b) - premium highlights
+ * - Background: Cool white (#fafbfc)
+ * - Typography: Playfair Display (headings), Source Sans 3 (body)
+ */
+
+@theme inline {
+  --font-sans: 'Source Sans 3', system-ui, sans-serif;
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  
+  /* Custom semantic colors for negotiation status */
+  --color-status-agreed: oklch(0.45 0.12 145);
+  --color-status-discussion: oklch(0.50 0.10 240);
+  --color-status-blocked: oklch(0.45 0.15 15);
+  --color-status-escalated: oklch(0.55 0.15 55);
+  --color-status-nochanges: oklch(0.55 0.02 250);
+  --color-gold: oklch(0.60 0.14 75);
+  --color-gold-light: oklch(0.85 0.08 75);
+  --color-navy: oklch(0.25 0.05 250);
+  --color-navy-light: oklch(0.35 0.05 250);
+}
+
+:root {
+  --radius: 0.5rem;
+  
+  /* Navy primary */
+  --primary: oklch(0.25 0.05 250);
+  --primary-foreground: oklch(0.98 0.005 250);
+  
+  /* Warm cream background #EDEDD8 */
+  --background: oklch(0.94 0.02 100);
+  --foreground: oklch(0.20 0.02 250);
+  
+  /* Card surfaces - slightly warmer white */
+  --card: oklch(0.97 0.01 100);
+  --card-foreground: oklch(0.20 0.02 250);
+  
+  /* Popover - same as card */
+  --popover: oklch(0.97 0.01 100);
+  --popover-foreground: oklch(0.20 0.02 250);
+  
+  /* Secondary - warm tint */
+  --secondary: oklch(0.92 0.015 100);
+  --secondary-foreground: oklch(0.35 0.02 250);
+  
+  /* Muted - warm tint to match background */
+  --muted: oklch(0.90 0.015 100);
+  --muted-foreground: oklch(0.50 0.02 250);
+  
+  /* Accent - gold tinted */
+  --accent: oklch(0.92 0.03 75);
+  --accent-foreground: oklch(0.25 0.05 250);
+  
+  /* Destructive - burgundy */
+  --destructive: oklch(0.45 0.18 15);
+  --destructive-foreground: oklch(0.98 0.005 15);
+  
+  /* Borders - slightly warmer */
+  --border: oklch(0.85 0.015 100);
+  --input: oklch(0.88 0.01 100);
+  --ring: oklch(0.60 0.14 75);
+  
+  /* Charts - navy to gold gradient */
+  --chart-1: oklch(0.25 0.05 250);
+  --chart-2: oklch(0.35 0.06 250);
+  --chart-3: oklch(0.50 0.10 240);
+  --chart-4: oklch(0.60 0.14 75);
+  --chart-5: oklch(0.45 0.12 145);
+  
+  /* Sidebar */
+  --sidebar: oklch(0.22 0.04 250);
+  --sidebar-foreground: oklch(0.92 0.01 250);
+  --sidebar-primary: oklch(0.60 0.14 75);
+  --sidebar-primary-foreground: oklch(0.15 0.03 250);
+  --sidebar-accent: oklch(0.30 0.04 250);
+  --sidebar-accent-foreground: oklch(0.92 0.01 250);
+  --sidebar-border: oklch(0.32 0.04 250);
+  --sidebar-ring: oklch(0.60 0.14 75);
+}
+
+.dark {
+  --primary: oklch(0.60 0.14 75);
+  --primary-foreground: oklch(0.15 0.03 250);
+  --background: oklch(0.15 0.02 250);
+  --foreground: oklch(0.92 0.01 250);
+  --card: oklch(0.18 0.02 250);
+  --card-foreground: oklch(0.92 0.01 250);
+  --popover: oklch(0.18 0.02 250);
+  --popover-foreground: oklch(0.92 0.01 250);
+  --secondary: oklch(0.22 0.02 250);
+  --secondary-foreground: oklch(0.80 0.01 250);
+  --muted: oklch(0.25 0.02 250);
+  --muted-foreground: oklch(0.65 0.01 250);
+  --accent: oklch(0.30 0.05 75);
+  --accent-foreground: oklch(0.92 0.01 250);
+  --destructive: oklch(0.55 0.20 15);
+  --destructive-foreground: oklch(0.98 0.005 15);
+  --border: oklch(0.30 0.02 250);
+  --input: oklch(0.28 0.02 250);
+  --ring: oklch(0.60 0.14 75);
+  --chart-1: oklch(0.60 0.14 75);
+  --chart-2: oklch(0.50 0.10 240);
+  --chart-3: oklch(0.45 0.12 145);
+  --chart-4: oklch(0.55 0.15 55);
+  --chart-5: oklch(0.45 0.15 15);
+  --sidebar: oklch(0.12 0.02 250);
+  --sidebar-foreground: oklch(0.92 0.01 250);
+  --sidebar-primary: oklch(0.60 0.14 75);
+  --sidebar-primary-foreground: oklch(0.15 0.03 250);
+  --sidebar-accent: oklch(0.20 0.02 250);
+  --sidebar-accent-foreground: oklch(0.92 0.01 250);
+  --sidebar-border: oklch(0.25 0.02 250);
+  --sidebar-ring: oklch(0.60 0.14 75);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif tracking-tight;
+  }
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [type="button"]:not(:disabled),
+  [type="submit"]:not(:disabled),
+  [type="reset"]:not(:disabled),
+  a[href],
+  select:not(:disabled),
+  input[type="checkbox"]:not(:disabled),
+  input[type="radio"]:not(:disabled) {
+    @apply cursor-pointer;
+  }
+}
+
+@layer components {
+  .container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .flex {
+    min-height: 0;
+    min-width: 0;
+  }
+
+  @media (min-width: 640px) {
+    .container {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .container {
+      padding-left: 2rem;
+      padding-right: 2rem;
+      max-width: 1400px;
+    }
+  }
+  
+  /* Status badge styles */
+  .status-agreed {
+    @apply bg-[oklch(0.92_0.06_145)] text-[oklch(0.30_0.10_145)] border-[oklch(0.80_0.08_145)];
+  }
+  .status-discussion {
+    @apply bg-[oklch(0.92_0.05_240)] text-[oklch(0.35_0.08_240)] border-[oklch(0.80_0.06_240)];
+  }
+  .status-blocked {
+    @apply bg-[oklch(0.92_0.06_15)] text-[oklch(0.40_0.12_15)] border-[oklch(0.80_0.08_15)];
+  }
+  .status-escalated {
+    @apply bg-[oklch(0.92_0.06_55)] text-[oklch(0.45_0.12_55)] border-[oklch(0.80_0.08_55)];
+  }
+  .status-nochanges {
+    @apply bg-[oklch(0.94_0.01_250)] text-[oklch(0.45_0.02_250)] border-[oklch(0.85_0.01_250)];
+  }
+  
+  /* Priority badge styles */
+  .priority-high {
+    @apply bg-[oklch(0.92_0.06_15)] text-[oklch(0.40_0.12_15)];
+  }
+  .priority-medium {
+    @apply bg-[oklch(0.92_0.06_55)] text-[oklch(0.45_0.12_55)];
+  }
+  .priority-low {
+    @apply bg-[oklch(0.92_0.06_145)] text-[oklch(0.35_0.10_145)];
+  }
+  
+  /* Gold accent utilities */
+  .gold-accent {
+    @apply text-[oklch(0.55_0.14_75)];
+  }
+  .gold-border {
+    @apply border-[oklch(0.70_0.12_75)];
+  }
+  .gold-bg {
+    @apply bg-[oklch(0.92_0.06_75)];
+  }
+  
+  /* Glass card effect */
+  .glass-card {
+    @apply bg-white/80 backdrop-blur-sm border border-border shadow-sm;
+  }
+  
+  /* Diff styles */
+  .diff-added {
+    @apply bg-[oklch(0.92_0.08_145)] text-[oklch(0.30_0.10_145)];
+  }
+  .diff-removed {
+    @apply bg-[oklch(0.92_0.08_15)] text-[oklch(0.35_0.12_15)] line-through;
+  }
+  .diff-unchanged {
+    @apply text-foreground;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .font-display {
+    font-family: 'Playfair Display', Georgia, serif;
+  }
+}
