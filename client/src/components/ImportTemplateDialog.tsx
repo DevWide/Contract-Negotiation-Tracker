@@ -48,12 +48,11 @@ interface ImportTemplateDialogProps {
     clauses: Array<{
       clauseNumber: string;
       topic: string;
-      clauseText: string;
+      baselineText: string;
+      theirPosition: string;
+      ourPosition: string;
       issue: string;
       rationale: string;
-      proposedChange: string;
-      counterProposal: string;
-      counterproposalWording: string;
       impactCategory: string;
       impactSubcategory: string;
     }>;
@@ -175,12 +174,11 @@ export function ImportTemplateDialog({
       clauses: selectedClauses.map(clause => ({
         clauseNumber: clause.clauseNumber,
         topic: clause.topic, // Subclause title (e.g., "Affiliate", "Fees")
-        clauseText: clause.clauseText,
+        baselineText: clause.clauseText,
+        theirPosition: '',
+        ourPosition: '',
         issue: clause.topic, // Use topic as issue for display
         rationale: '',
-        proposedChange: '',
-        counterProposal: '',
-        counterproposalWording: '',
         impactCategory: clause.issue, // Section category (e.g., "Definitions", "Fees and Payment")
         impactSubcategory: '',
       })),

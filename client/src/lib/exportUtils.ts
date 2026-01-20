@@ -22,10 +22,11 @@ export function exportToCSV(contract: Contract): string {
   const headers = [
     'Clause Number',
     'Issue/Topic',
-    'Original Text',
-    'Proposed Change',
-    'Counter-Proposal',
-    'Counter-Proposal Wording',
+    'Baseline Text',
+    'Their Position',
+    'Our Position',
+    'Rationale',
+    'Round',
     'Status',
     'Priority',
     'Owner',
@@ -37,10 +38,11 @@ export function exportToCSV(contract: Contract): string {
   const rows = contract.items.map(item => [
     escapeCSV(item.clauseNumber),
     escapeCSV(item.issue),
-    escapeCSV(item.clauseText),
-    escapeCSV(item.proposedChange),
-    escapeCSV(item.counterProposal),
-    escapeCSV(item.counterproposalWording),
+    escapeCSV(item.baselineText),
+    escapeCSV(item.theirPosition),
+    escapeCSV(item.ourPosition),
+    escapeCSV(item.rationale),
+    escapeCSV(item.currentRound),
     escapeCSV(item.status),
     escapeCSV(item.priority),
     escapeCSV(item.owner),
@@ -105,21 +107,27 @@ export function parseCSV(content: string): Partial<ClauseItem>[] {
         case 'issue':
           item.issue = value;
           break;
+        case 'baseline text':
         case 'original text':
         case 'clause text':
-          item.clauseText = value;
+          item.baselineText = value;
           break;
+        case 'their position':
         case 'proposed change':
-        case 'rationale': // Legacy support
-          item.proposedChange = value;
+          item.theirPosition = value;
           break;
+        case 'our position':
         case 'counter-proposal':
         case 'counterproposal':
-          item.counterProposal = value;
-          break;
         case 'counter-proposal wording':
         case 'counterproposal wording':
-          item.counterproposalWording = value;
+          item.ourPosition = value;
+          break;
+        case 'rationale':
+          item.rationale = value;
+          break;
+        case 'round':
+          item.currentRound = parseInt(value) || 0;
           break;
         case 'status':
           item.status = value as ClauseItem['status'];
@@ -142,7 +150,7 @@ export function parseCSV(content: string): Partial<ClauseItem>[] {
       }
     });
 
-    if (item.clauseNumber || item.issue || item.clauseText) {
+    if (item.clauseNumber || item.issue || item.baselineText) {
       items.push(item);
     }
   }
@@ -203,10 +211,10 @@ export function exportTemplateToCSV(template: Template): string {
   const headers = [
     'Clause Number',
     'Issue/Topic',
-    'Clause Text',
-    'Proposed Change',
-    'Counter-Proposal',
-    'Counter-Proposal Wording',
+    'Baseline Text',
+    'Their Position',
+    'Our Position',
+    'Rationale',
     'Impact Category',
     'Impact Subcategory',
   ];
@@ -214,10 +222,10 @@ export function exportTemplateToCSV(template: Template): string {
   const rows = template.clauses.map(clause => [
     escapeCSV(clause.clauseNumber),
     escapeCSV(clause.issue),
-    escapeCSV(clause.clauseText),
-    escapeCSV(clause.proposedChange),
-    escapeCSV(clause.counterProposal),
-    escapeCSV(clause.counterproposalWording),
+    escapeCSV(clause.baselineText),
+    escapeCSV(clause.theirPosition),
+    escapeCSV(clause.ourPosition),
+    escapeCSV(clause.rationale),
     escapeCSV(clause.impactCategory),
     escapeCSV(clause.impactSubcategory),
   ]);
@@ -268,20 +276,24 @@ export function parseTemplateCSV(content: string): Partial<Template['clauses'][0
         case 'issue':
           clause.issue = value;
           break;
+        case 'baseline text':
         case 'clause text':
         case 'original text':
-          clause.clauseText = value;
+          clause.baselineText = value;
           break;
+        case 'their position':
         case 'proposed change':
-          clause.proposedChange = value;
+          clause.theirPosition = value;
           break;
+        case 'our position':
         case 'counter-proposal':
         case 'counterproposal':
-          clause.counterProposal = value;
-          break;
         case 'counter-proposal wording':
         case 'counterproposal wording':
-          clause.counterproposalWording = value;
+          clause.ourPosition = value;
+          break;
+        case 'rationale':
+          clause.rationale = value;
           break;
         case 'impact category':
           clause.impactCategory = value;
@@ -292,7 +304,7 @@ export function parseTemplateCSV(content: string): Partial<Template['clauses'][0
       }
     });
 
-    if (clause.clauseNumber || clause.issue || clause.clauseText) {
+    if (clause.clauseNumber || clause.issue || clause.baselineText) {
       clauses.push(clause);
     }
   }

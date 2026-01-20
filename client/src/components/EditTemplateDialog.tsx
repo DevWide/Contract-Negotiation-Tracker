@@ -88,12 +88,11 @@ export function EditTemplateDialog({
       id: `new-${Date.now()}`,
       clauseNumber: `${clauses.length + 1}`,
       topic: 'General',
-      clauseText: '',
+      baselineText: '',
+      theirPosition: '',
+      ourPosition: '',
       issue: '',
       rationale: '',
-      proposedChange: '',
-      counterProposal: '',
-      counterproposalWording: '',
       impactCategory: 'General',
       impactSubcategory: '',
       isNew: true,
@@ -229,8 +228,8 @@ export function EditTemplateDialog({
                               {clause.issue || 'Untitled Clause'}
                             </p>
                             <p className="text-xs text-muted-foreground truncate">
-                              {clause.clauseText?.slice(0, 60) || 'No content'}
-                              {clause.clauseText?.length > 60 && '...'}
+                              {clause.baselineText?.slice(0, 60) || 'No content'}
+                              {clause.baselineText && clause.baselineText.length > 60 && '...'}
                             </p>
                           </div>
                         </div>
@@ -270,10 +269,10 @@ export function EditTemplateDialog({
                               </div>
                             </div>
                             <div className="space-y-1.5">
-                              <Label className="text-xs">Clause Text</Label>
+                              <Label className="text-xs">Baseline Text</Label>
                               <Textarea
-                                value={clause.clauseText}
-                                onChange={e => handleClauseChange(clause.id, 'clauseText', e.target.value)}
+                                value={clause.baselineText}
+                                onChange={e => handleClauseChange(clause.id, 'baselineText', e.target.value)}
                                 placeholder="Full clause text..."
                                 rows={3}
                                 className="text-sm"
@@ -292,31 +291,31 @@ export function EditTemplateDialog({
 
                           <TabsContent value="playbook" className="space-y-3">
                             <div className="space-y-1.5">
-                              <Label className="text-xs">Proposed Change</Label>
+                              <Label className="text-xs">Their Position</Label>
                               <Textarea
-                                value={clause.proposedChange}
-                                onChange={e => handleClauseChange(clause.id, 'proposedChange', e.target.value)}
-                                placeholder="Our initial position..."
+                                value={clause.theirPosition}
+                                onChange={e => handleClauseChange(clause.id, 'theirPosition', e.target.value)}
+                                placeholder="Counterparty's proposed position..."
                                 rows={2}
                                 className="text-sm"
                               />
                             </div>
                             <div className="space-y-1.5">
-                              <Label className="text-xs">Counter-Proposal Response</Label>
+                              <Label className="text-xs">Our Position</Label>
                               <Textarea
-                                value={clause.counterProposal}
-                                onChange={e => handleClauseChange(clause.id, 'counterProposal', e.target.value)}
-                                placeholder="If counterparty pushes back..."
+                                value={clause.ourPosition}
+                                onChange={e => handleClauseChange(clause.id, 'ourPosition', e.target.value)}
+                                placeholder="Our proposed position..."
                                 rows={2}
                                 className="text-sm"
                               />
                             </div>
                             <div className="space-y-1.5">
-                              <Label className="text-xs">Counter-Proposal Wording</Label>
+                              <Label className="text-xs">Rationale</Label>
                               <Textarea
-                                value={clause.counterproposalWording}
-                                onChange={e => handleClauseChange(clause.id, 'counterproposalWording', e.target.value)}
-                                placeholder="Alternative wording to propose..."
+                                value={clause.rationale}
+                                onChange={e => handleClauseChange(clause.id, 'rationale', e.target.value)}
+                                placeholder="Why we're taking this position..."
                                 rows={2}
                                 className="text-sm"
                               />

@@ -1,5 +1,6 @@
 // Contract Negotiation Tracker - useVersionHistory Hook
 // Clause version snapshots, comparison, and multi-round negotiation tracking
+// Uses 3-Text Model: baselineText, theirPosition, ourPosition
 
 import { useCallback } from 'react';
 import type { ClauseVersion, ClauseItem, NegotiationParty } from '@/types';
@@ -13,15 +14,16 @@ interface SaveVersionOptions {
 export function useVersionHistory(
   updateClauseItem: (contractId: number, itemId: number, updates: Partial<ClauseItem>) => void
 ) {
-  // Get the current round number for a clause
+  // Get the current round number for a clause (from item or versions)
   const getCurrentRound = useCallback((item: ClauseItem): number => {
+    if (item.currentRound) return item.currentRound;
     const versions = item.versions || [];
-    if (versions.length === 0) return 0;
+    if (versions.length === 0) return 1;
     const maxRound = Math.max(...versions.map(v => v.round || 0));
-    return maxRound;
+    return Math.max(maxRound, 1);
   }, []);
 
-  // Save a version with optional round tracking
+  // Save a version with optional round tracking (3-Text Model)
   const saveVersion = useCallback((
     contractId: number,
     item: ClauseItem,
@@ -37,16 +39,19 @@ export function useVersionHistory(
       label,
       round: currentRound,
       party: options?.party,
-      clauseText: item.clauseText,
-      proposedChange: item.proposedChange,
-      counterProposal: item.counterProposal,
-      counterproposalWording: item.counterproposalWording,
+      // 3-Text Model snapshot
+      baselineText: item.baselineText,
+      theirPosition: item.theirPosition,
+      ourPosition: item.ourPosition,
+      status: item.status,
       timestamp: new Date().toISOString(),
       notes: options?.notes,
     };
 
+    // Update both versions array and currentRound on the item
     updateClauseItem(contractId, item.id, {
       versions: [...existingVersions, newVersion],
+      currentRound: currentRound,
     });
 
     return newVersion;
@@ -117,29 +122,28 @@ export function useVersionHistory(
       label: 'Before restore',
       round: currentRound,
       party: 'us',
-      clauseText: item.clauseText,
-      proposedChange: item.proposedChange,
-      counterProposal: item.counterProposal,
-      counterproposalWording: item.counterproposalWording,
+      // 3-Text Model snapshot
+      baselineText: item.baselineText,
+      theirPosition: item.theirPosition,
+      ourPosition: item.ourPosition,
+      status: item.status,
       timestamp: new Date().toISOString(),
     };
 
     const existingVersions = item.versions || [];
+    // Restore from version - note: baselineText rarely changes
     updateClauseItem(contractId, item.id, {
-      clauseText: version.clauseText,
-      proposedChange: version.proposedChange || item.proposedChange,
-      counterProposal: version.counterProposal || item.counterProposal,
-      counterproposalWording: version.counterproposalWording,
+      theirPosition: version.theirPosition,
+      ourPosition: version.ourPosition,
       versions: [...existingVersions, backupVersion],
     });
   }, [updateClauseItem, getCurrentRound]);
 
   const compareVersions = useCallback((v1: ClauseVersion, v2: ClauseVersion) => {
     return {
-      clauseTextChanged: v1.clauseText !== v2.clauseText,
-      proposedChangeChanged: v1.proposedChange !== v2.proposedChange,
-      counterProposalChanged: v1.counterProposal !== v2.counterProposal,
-      counterproposalWordingChanged: v1.counterproposalWording !== v2.counterproposalWording,
+      baselineChanged: v1.baselineText !== v2.baselineText,
+      theirPositionChanged: v1.theirPosition !== v2.theirPosition,
+      ourPositionChanged: v1.ourPosition !== v2.ourPosition,
     };
   }, []);
 

@@ -136,11 +136,11 @@ export function TemplatesPage({ onClose }: TemplatesPageProps) {
   const [templateName, setTemplateName] = useState('');
   const [templateDesc, setTemplateDesc] = useState('');
   const [clauseNumber, setClauseNumber] = useState('');
-  const [clauseText, setClauseText] = useState('');
+  const [clauseBaselineText, setClauseBaselineText] = useState('');
   const [clauseIssue, setClauseIssue] = useState('');
   const [clauseRationale, setClauseRationale] = useState('');
-  const [clauseCounterProposal, setClauseCounterProposal] = useState('');
-  const [clauseCounterWording, setClauseCounterWording] = useState('');
+  const [clauseTheirPosition, setClauseTheirPosition] = useState('');
+  const [clauseOurPosition, setClauseOurPosition] = useState('');
   const [clauseCategory, setClauseCategory] = useState('');
   const [clauseSubcategory, setClauseSubcategory] = useState('');
   const [clauseStatus, setClauseStatus] = useState('pending');
@@ -252,12 +252,11 @@ export function TemplatesPage({ onClose }: TemplatesPageProps) {
       addClauseToTemplate(template.id, {
         clauseNumber: clause.clauseNumber,
         topic: clause.topic, // Subclause title (e.g., "Affiliate", "Fees")
-        clauseText: clause.clauseText,
+        baselineText: clause.clauseText, // Map parsed clauseText to baselineText
+        theirPosition: '', // Start empty
+        ourPosition: '', // Start empty
         issue: clause.topic, // Use topic as issue for display
         rationale: '',
-        proposedChange: '',
-        counterProposal: '',
-        counterproposalWording: '',
         impactCategory: clause.issue, // Section category (e.g., "Definitions", "Fees and Payment")
         impactSubcategory: '',
       });
@@ -321,11 +320,11 @@ export function TemplatesPage({ onClose }: TemplatesPageProps) {
 
   const resetClauseForm = () => {
     setClauseNumber('');
-    setClauseText('');
+    setClauseBaselineText('');
     setClauseIssue('');
     setClauseRationale('');
-    setClauseCounterProposal('');
-    setClauseCounterWording('');
+    setClauseTheirPosition('');
+    setClauseOurPosition('');
     setClauseCategory('');
     setClauseSubcategory('');
     setClauseStatus('pending');
@@ -342,11 +341,11 @@ export function TemplatesPage({ onClose }: TemplatesPageProps) {
     setSelectedTemplate(template);
     setSelectedClause(clause);
     setClauseNumber(clause.clauseNumber);
-    setClauseText(clause.clauseText);
+    setClauseBaselineText(clause.baselineText);
     setClauseIssue(clause.issue);
     setClauseRationale(clause.rationale);
-    setClauseCounterProposal(clause.counterProposal);
-    setClauseCounterWording(clause.counterproposalWording);
+    setClauseTheirPosition(clause.theirPosition);
+    setClauseOurPosition(clause.ourPosition);
     setClauseCategory(clause.impactCategory);
     setClauseSubcategory(clause.impactSubcategory);
     setClauseStatus((clause as any).status || 'pending');
@@ -358,11 +357,11 @@ export function TemplatesPage({ onClose }: TemplatesPageProps) {
 
     const clauseData = {
       clauseNumber: clauseNumber.trim(),
-      clauseText: clauseText.trim(),
+      baselineText: clauseBaselineText.trim(),
+      theirPosition: clauseTheirPosition.trim(),
+      ourPosition: clauseOurPosition.trim(),
       issue: clauseIssue.trim(),
       rationale: clauseRationale.trim(),
-      counterProposal: clauseCounterProposal.trim(),
-      counterproposalWording: clauseCounterWording.trim(),
       impactCategory: clauseCategory,
       impactSubcategory: clauseSubcategory,
       status: clauseStatus,
@@ -385,9 +384,9 @@ export function TemplatesPage({ onClose }: TemplatesPageProps) {
   };
 
   const handleOpenTrackChanges = (template: Template, clause: TemplateClause) => {
-    // Filter clauses that have both original and counter-proposal text
+    // Filter clauses that have both baseline and our position text
     const clausesWithChanges = template.clauses.filter(
-      c => c.clauseText && c.counterproposalWording
+      c => c.baselineText && c.ourPosition
     );
     const index = clausesWithChanges.findIndex(c => c.id === clause.id);
     
@@ -420,10 +419,10 @@ export function TemplatesPage({ onClose }: TemplatesPageProps) {
       const header = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/['"]/g, ''));
       const clauseNumIdx = header.findIndex(h => h.includes('clause') && h.includes('#') || h === 'clausenumber');
       const topicIdx = header.findIndex(h => h.includes('topic') || h.includes('issue'));
-      const textIdx = header.findIndex(h => h.includes('text') || h.includes('clause text'));
+      const textIdx = header.findIndex(h => h.includes('text') || h.includes('clause text') || h.includes('baseline'));
       const rationaleIdx = header.findIndex(h => h.includes('rationale'));
-      const counterIdx = header.findIndex(h => h.includes('counter') && h.includes('proposal'));
-      const counterWordingIdx = header.findIndex(h => h.includes('counter') && h.includes('wording'));
+      const theirPosIdx = header.findIndex(h => h.includes('their') && h.includes('position'));
+      const ourPosIdx = header.findIndex(h => h.includes('our') && h.includes('position'));
 
       // Create new template from CSV
       const clauses: Omit<TemplateClause, 'id'>[] = [];
@@ -434,11 +433,12 @@ export function TemplatesPage({ onClose }: TemplatesPageProps) {
 
         clauses.push({
           clauseNumber: clauseNumIdx >= 0 ? values[clauseNumIdx] : `${i}`,
-          clauseText: textIdx >= 0 ? values[textIdx] : '',
+          topic: topicIdx >= 0 ? values[topicIdx] : values[1] || '',
+          baselineText: textIdx >= 0 ? values[textIdx] : '',
+          theirPosition: theirPosIdx >= 0 ? values[theirPosIdx] : '',
+          ourPosition: ourPosIdx >= 0 ? values[ourPosIdx] : '',
           issue: topicIdx >= 0 ? values[topicIdx] : values[1] || '',
           rationale: rationaleIdx >= 0 ? values[rationaleIdx] : '',
-          counterProposal: counterIdx >= 0 ? values[counterIdx] : '',
-          counterproposalWording: counterWordingIdx >= 0 ? values[counterWordingIdx] : '',
           impactCategory: '',
           impactSubcategory: '',
         });
@@ -667,10 +667,10 @@ export function TemplatesPage({ onClose }: TemplatesPageProps) {
                                   <tr className="border-b bg-muted/50">
                                     <th className="text-left p-3 text-xs font-semibold uppercase tracking-wider w-20">Clause #</th>
                                     <th className="text-left p-3 text-xs font-semibold uppercase tracking-wider w-32">Topic</th>
-                                    <th className="text-left p-3 text-xs font-semibold uppercase tracking-wider w-64">Clause Text</th>
+                                    <th className="text-left p-3 text-xs font-semibold uppercase tracking-wider w-64">Baseline Text</th>
                                     <th className="text-left p-3 text-xs font-semibold uppercase tracking-wider w-48">Issue & Rationale</th>
-                                    <th className="text-left p-3 text-xs font-semibold uppercase tracking-wider w-40">Counter Proposal</th>
-                                    <th className="text-left p-3 text-xs font-semibold uppercase tracking-wider w-64">Counterproposal Wording</th>
+                                    <th className="text-left p-3 text-xs font-semibold uppercase tracking-wider w-40">Their Position</th>
+                                    <th className="text-left p-3 text-xs font-semibold uppercase tracking-wider w-64">Our Position</th>
                                     <th className="text-left p-3 text-xs font-semibold uppercase tracking-wider w-28">
                                       <div className="flex items-center gap-1">
                                         Impact
@@ -689,7 +689,7 @@ export function TemplatesPage({ onClose }: TemplatesPageProps) {
                                 <tbody>
                                   {template.clauses.map(clause => {
                                     const status = getStatusBadge((clause as any).status || 'pending');
-                                    const hasChanges = clause.clauseText && clause.counterproposalWording;
+                                    const hasChanges = clause.baselineText && clause.ourPosition;
                                     
                                     return (
                                       <tr key={clause.id} className="border-b last:border-0 hover:bg-muted/30 align-top">
@@ -697,7 +697,7 @@ export function TemplatesPage({ onClose }: TemplatesPageProps) {
                                         <td className="p-3 text-sm font-medium">{clause.issue}</td>
                                         <td className="p-3 text-sm text-muted-foreground">
                                           <div className="line-clamp-3">
-                                            {clause.clauseText || <span className="italic">No text</span>}
+                                            {clause.baselineText || <span className="italic">No text</span>}
                                           </div>
                                         </td>
                                         <td className="p-3 text-sm text-muted-foreground">
@@ -707,12 +707,12 @@ export function TemplatesPage({ onClose }: TemplatesPageProps) {
                                         </td>
                                         <td className="p-3 text-sm">
                                           <div className="line-clamp-2">
-                                            {clause.counterProposal || <span className="italic text-muted-foreground">—</span>}
+                                            {clause.theirPosition || <span className="italic text-muted-foreground">—</span>}
                                           </div>
                                         </td>
                                         <td className="p-3 text-sm text-muted-foreground">
                                           <div className="line-clamp-3">
-                                            {clause.counterproposalWording || <span className="italic">—</span>}
+                                            {clause.ourPosition || <span className="italic">—</span>}
                                           </div>
                                         </td>
                                         <td className="p-3 text-sm">
@@ -1196,11 +1196,11 @@ export function TemplatesPage({ onClose }: TemplatesPageProps) {
               </div>
             </div>
             <div className="space-y-2">
-              <Label>Clause Text (Original)</Label>
+              <Label>Baseline Text</Label>
               <Textarea
-                placeholder="Original clause text..."
-                value={clauseText}
-                onChange={e => setClauseText(e.target.value)}
+                placeholder="Original/baseline clause text..."
+                value={clauseBaselineText}
+                onChange={e => setClauseBaselineText(e.target.value)}
                 rows={4}
               />
             </div>
@@ -1214,19 +1214,20 @@ export function TemplatesPage({ onClose }: TemplatesPageProps) {
               />
             </div>
             <div className="space-y-2">
-              <Label>Counter-Proposal Summary</Label>
-              <Input
-                placeholder="Brief summary of counter-proposal"
-                value={clauseCounterProposal}
-                onChange={e => setClauseCounterProposal(e.target.value)}
+              <Label>Their Position</Label>
+              <Textarea
+                placeholder="Expected counterparty position..."
+                value={clauseTheirPosition}
+                onChange={e => setClauseTheirPosition(e.target.value)}
+                rows={3}
               />
             </div>
             <div className="space-y-2">
-              <Label>Counter-Proposal Wording</Label>
+              <Label>Our Position</Label>
               <Textarea
-                placeholder="Proposed alternative wording..."
-                value={clauseCounterWording}
-                onChange={e => setClauseCounterWording(e.target.value)}
+                placeholder="Our standard counter-position..."
+                value={clauseOurPosition}
+                onChange={e => setClauseOurPosition(e.target.value)}
                 rows={4}
               />
             </div>
@@ -1349,8 +1350,8 @@ export function TemplatesPage({ onClose }: TemplatesPageProps) {
               {/* Diff Statistics */}
               {(() => {
                 const stats = computeDiffStats(
-                  trackChangesClause.clauseText,
-                  trackChangesClause.counterproposalWording
+                  trackChangesClause.baselineText,
+                  trackChangesClause.ourPosition
                 );
                 return (
                   <div className="flex items-center gap-4 mb-6">
@@ -1404,8 +1405,8 @@ export function TemplatesPage({ onClose }: TemplatesPageProps) {
                   </div>
                   <div className="bg-gray-50 rounded-lg p-4 min-h-[200px] text-sm leading-relaxed border">
                     {renderDiffText(
-                      trackChangesClause.clauseText,
-                      trackChangesClause.counterproposalWording,
+                      trackChangesClause.baselineText,
+                      trackChangesClause.ourPosition,
                       true
                     )}
                   </div>
@@ -1416,7 +1417,7 @@ export function TemplatesPage({ onClose }: TemplatesPageProps) {
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full bg-green-500" />
-                      <span className="text-sm font-semibold uppercase tracking-wider">Proposed</span>
+                      <span className="text-sm font-semibold uppercase tracking-wider">Our Position</span>
                     </div>
                     <Button variant="ghost" size="sm" className="h-7 text-xs">
                       <Copy className="w-3 h-3 mr-1" />
@@ -1425,8 +1426,8 @@ export function TemplatesPage({ onClose }: TemplatesPageProps) {
                   </div>
                   <div className="bg-gray-50 rounded-lg p-4 min-h-[200px] text-sm leading-relaxed border">
                     {renderDiffText(
-                      trackChangesClause.clauseText,
-                      trackChangesClause.counterproposalWording,
+                      trackChangesClause.baselineText,
+                      trackChangesClause.ourPosition,
                       false
                     )}
                   </div>

@@ -7,7 +7,7 @@ import { defaultColumnConfig } from '@/data/sampleData';
 
 const STORAGE_KEY = 'negotiation-tracker-columns';
 const CONFIG_VERSION_KEY = 'negotiation-tracker-columns-version';
-const CURRENT_VERSION = 3; // Increment this when defaultColumnConfig changes
+const CURRENT_VERSION = 4; // v4: 3-Text Model (baselineText, theirPosition, ourPosition)
 
 function loadColumnConfig(): ColumnConfig[] {
   try {

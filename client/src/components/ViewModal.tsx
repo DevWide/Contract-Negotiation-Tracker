@@ -112,45 +112,57 @@ export function ViewModal({ item, open, onClose, onEdit, onCompare }: ViewModalP
 
             <Separator />
 
-            {/* Original Clause Text */}
+            {/* Baseline Text */}
             <div>
               <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-2">
-                Original Clause Text
+                Baseline Text
               </h4>
               <div className="p-4 bg-muted/30 rounded-lg font-serif text-sm leading-relaxed">
-                {item.clauseText || <span className="text-muted-foreground italic">No original text provided</span>}
+                {item.baselineText || <span className="text-muted-foreground italic">No baseline text provided</span>}
               </div>
             </div>
 
-            {/* Proposed Change */}
-            {item.proposedChange && (
+            {/* Their Position */}
+            {item.theirPosition && item.theirPosition !== item.baselineText && (
               <div>
                 <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-2">
-                  Proposed Change
+                  Their Position
                 </h4>
-                <p className="text-sm leading-relaxed">{item.proposedChange}</p>
+                <div className="p-4 bg-[oklch(0.92_0.06_25)]/30 border border-[oklch(0.80_0.08_25)] rounded-lg font-serif text-sm leading-relaxed">
+                  {item.theirPosition}
+                </div>
               </div>
             )}
 
-            {/* Counter-Proposal Summary */}
-            {item.counterProposal && (
+            {/* Our Position */}
+            {item.ourPosition && (
               <div>
                 <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-2">
-                  Counter-Proposal Summary
-                </h4>
-                <p className="text-sm leading-relaxed">{item.counterProposal}</p>
-              </div>
-            )}
-
-            {/* Counter-Proposal Wording */}
-            {item.counterproposalWording && (
-              <div>
-                <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-2">
-                  Counter-Proposal Wording
+                  Our Position
                 </h4>
                 <div className="p-4 bg-[oklch(0.92_0.06_145)]/30 border border-[oklch(0.80_0.08_145)] rounded-lg font-serif text-sm leading-relaxed">
-                  {item.counterproposalWording}
+                  {item.ourPosition}
                 </div>
+              </div>
+            )}
+
+            {/* Rationale */}
+            {item.rationale && (
+              <div>
+                <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-2">
+                  Rationale
+                </h4>
+                <p className="text-sm leading-relaxed">{item.rationale}</p>
+              </div>
+            )}
+
+            {/* Current Round */}
+            {item.currentRound !== undefined && (
+              <div>
+                <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-2">
+                  Current Round
+                </h4>
+                <Badge variant="outline">Round {item.currentRound}</Badge>
               </div>
             )}
 

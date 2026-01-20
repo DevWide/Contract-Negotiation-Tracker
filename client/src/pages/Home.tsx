@@ -1,7 +1,7 @@
 // Contract Negotiation Tracker - Home Page
 // Design: Refined Legal Elegance - Main application layout
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useNegotiation } from '@/contexts/NegotiationContext';
 import { Header } from '@/components/Header';
 import { ContractStatusBar } from '@/components/ContractStatusBar';
@@ -53,6 +53,9 @@ export default function Home() {
   const [showNewContractDialog, setShowNewContractDialog] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   
+  // Ref for the form area - used to scroll when editing
+  const formAreaRef = useRef<HTMLDivElement>(null);
+  
   // View/Edit states
   const [viewingItem, setViewingItem] = useState<ClauseItem | null>(null);
   const [editingItem, setEditingItem] = useState<ClauseItem | null>(null);
@@ -96,6 +99,13 @@ export default function Home() {
     setEditingItem(item);
     setViewingItem(null);
   }, []);
+
+  // Scroll to form when editing starts
+  useEffect(() => {
+    if (editingItem && formAreaRef.current) {
+      formAreaRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [editingItem]);
 
   const handleCompareItem = useCallback((item: ClauseItem) => {
     setComparingItem(item);
@@ -298,20 +308,22 @@ export default function Home() {
           <FilterBar onImport={() => setShowImport(true)} />
 
           {/* Add/Edit Form */}
-          {(showAddForm || editingItem) && (
-            <ClauseForm 
-              editingItem={editingItem}
-              onClose={() => {
-                setShowAddForm(false);
-                setEditingItem(null);
-              }}
-              onSaved={() => {
-                if (editingItem) {
+          <div ref={formAreaRef}>
+            {(showAddForm || editingItem) && (
+              <ClauseForm 
+                editingItem={editingItem}
+                onClose={() => {
+                  setShowAddForm(false);
                   setEditingItem(null);
-                }
-              }}
-            />
-          )}
+                }}
+                onSaved={() => {
+                  if (editingItem) {
+                    setEditingItem(null);
+                  }
+                }}
+              />
+            )}
+          </div>
 
           <SectionErrorBoundary sectionName="Clause Table">
             <ClauseTable 

@@ -6,16 +6,32 @@ import type { Contract, ClauseItem, TimelineEvent, PaperSource, BallInCourt, Con
 import { sampleContracts } from '@/data/sampleData';
 
 const STORAGE_KEY = 'negotiation-tracker-contracts';
+const VERSION_KEY = 'negotiation-tracker-contracts-version';
+const CURRENT_VERSION = 5; // Increment when sample data changes - v5 added Round 2 versions
 
 function loadContracts(): Contract[] {
   try {
+    // Check version - if outdated, reset to sample data
+    const storedVersion = localStorage.getItem(VERSION_KEY);
+    if (storedVersion && parseInt(storedVersion) < CURRENT_VERSION) {
+      console.log('Contract data version outdated, resetting to sample data');
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.setItem(VERSION_KEY, CURRENT_VERSION.toString());
+      return sampleContracts;
+    }
+    
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
+      // Set version if not present
+      if (!storedVersion) {
+        localStorage.setItem(VERSION_KEY, CURRENT_VERSION.toString());
+      }
       return JSON.parse(stored);
     }
   } catch (e) {
     console.error('Failed to load contracts from localStorage:', e);
   }
+  localStorage.setItem(VERSION_KEY, CURRENT_VERSION.toString());
   return sampleContracts;
 }
 
@@ -90,18 +106,21 @@ export function useContracts() {
       ballInCourt: 'them', // We sent it out first
       createdAt: now.toISOString(),
       updatedAt: now.toISOString(),
-      // Only copy the original clause text from template
-      // proposedChange, counterProposal, counterproposalWording are left empty
+      // Only copy the baseline text from template
+      // theirPosition and ourPosition start from baseline
       // because this is a fresh contract - no negotiation has happened yet
       items: data.template.clauses.map((clause, index) => ({
         id: Date.now() + index + 1,
         clauseNumber: clause.clauseNumber,
-        clauseText: clause.clauseText, // Original template text
-        topic: clause.issue.split(' ')[0] || 'General', // Extract topic from issue if available
+        topic: clause.topic || clause.issue.split(' ')[0] || 'General',
+        // ===== THE 3 TEXTS =====
+        baselineText: clause.baselineText, // Template's baseline text
+        theirPosition: clause.baselineText, // Start same as baseline
+        ourPosition: '', // Empty - we haven't responded yet
+        // ===== CONTEXT =====
         issue: clause.issue,
-        proposedChange: '', // Empty - no changes proposed yet
-        counterProposal: '', // Empty - no counterparty response yet
-        counterproposalWording: '', // Empty - no alternative wording yet
+        rationale: clause.rationale || '',
+        currentRound: 0, // Fresh contract starts at round 0
         status: 'No Changes' as const,
         priority: 'Medium' as const,
         owner: 'Legal',
@@ -279,12 +298,15 @@ export function useContracts() {
       const newItems: ClauseItem[] = items.map((item, index) => ({
         id: Date.now() + index,
         clauseNumber: item.clauseNumber || '',
-        clauseText: item.clauseText || '',
         topic: item.topic || '',
+        // ===== THE 3 TEXTS =====
+        baselineText: item.baselineText || '',
+        theirPosition: item.theirPosition || '',
+        ourPosition: item.ourPosition || '',
+        // ===== CONTEXT =====
         issue: item.issue || '',
-        proposedChange: item.proposedChange || '',
-        counterProposal: item.counterProposal || '',
-        counterproposalWording: item.counterproposalWording || '',
+        rationale: item.rationale || '',
+        currentRound: item.currentRound || 0,
         status: item.status || 'No Changes',
         priority: item.priority || 'Medium',
         owner: item.owner || 'Legal',

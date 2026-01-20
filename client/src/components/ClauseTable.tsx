@@ -340,18 +340,18 @@ export function ClauseTable({
               className="font-medium"
             />
             <PopoverTextEditor
-              value={item.proposedChange}
-              onSave={(value) => handleFieldChange(item, 'proposedChange', value)}
-              label="Edit Proposed Change"
-              placeholder="Enter proposed change..."
+              value={item.rationale}
+              onSave={(value) => handleFieldChange(item, 'rationale', value)}
+              label="Edit Rationale"
+              placeholder="Enter negotiation rationale..."
               displayValue={
-                item.proposedChange ? (
+                item.rationale ? (
                   <p className="text-xs text-muted-foreground truncate mt-0.5 max-w-[180px]">
-                    {item.proposedChange}
+                    {item.rationale}
                   </p>
                 ) : (
                   <p className="text-xs text-muted-foreground/50 italic mt-0.5">
-                    Add proposed change...
+                    Add rationale...
                   </p>
                 )
               }
@@ -508,61 +508,68 @@ export function ClauseTable({
           </Select>
         );
       
-      case 'clauseText':
+      case 'baselineText':
         return (
           <PopoverTextEditor
-            value={item.clauseText}
-            onSave={(value) => handleFieldChange(item, 'clauseText', value)}
-            label="Edit Clause Text"
-            placeholder="Enter clause text..."
+            value={item.baselineText}
+            onSave={(value) => handleFieldChange(item, 'baselineText', value)}
+            label="Edit Baseline Text"
+            placeholder="Enter baseline clause text..."
             displayValue={
               <p className="text-sm text-muted-foreground line-clamp-2 max-w-[250px]">
-                {item.clauseText || <span className="italic">No text</span>}
+                {item.baselineText || <span className="italic">No text</span>}
               </p>
             }
           />
         );
       
-      case 'counterProposal':
+      case 'theirPosition':
         return (
           <PopoverTextEditor
-            value={item.counterProposal}
-            onSave={(value) => handleFieldChange(item, 'counterProposal', value)}
-            label="Edit Counter-Proposal Summary"
-            placeholder="Brief summary of counter-proposal..."
-            displayValue={
-              <p className="text-sm text-muted-foreground line-clamp-2 max-w-[200px]">
-                {item.counterProposal || <span className="italic">—</span>}
-              </p>
-            }
-          />
-        );
-      
-      case 'counterproposalWording':
-        return (
-          <PopoverTextEditor
-            value={item.counterproposalWording}
-            onSave={(value) => handleFieldChange(item, 'counterproposalWording', value)}
-            label="Edit Counter-Proposal Wording"
-            placeholder="Enter proposed alternative wording..."
+            value={item.theirPosition}
+            onSave={(value) => handleFieldChange(item, 'theirPosition', value)}
+            label="Edit Their Position"
+            placeholder="Enter counterparty's proposed text..."
             displayValue={
               <p className="text-sm text-muted-foreground line-clamp-2 max-w-[250px]">
-                {item.counterproposalWording || <span className="italic">—</span>}
+                {item.theirPosition || <span className="italic">—</span>}
               </p>
             }
           />
         );
       
-      case 'proposedChange':
+      case 'ourPosition':
         return (
           <PopoverTextEditor
-            value={item.proposedChange}
-            onSave={(value) => handleFieldChange(item, 'proposedChange', value)}
-            label="Edit Proposed Change"
-            placeholder="Enter proposed change..."
+            value={item.ourPosition}
+            onSave={(value) => handleFieldChange(item, 'ourPosition', value)}
+            label="Edit Our Position"
+            placeholder="Enter our proposed text..."
+            displayValue={
+              <p className="text-sm text-muted-foreground line-clamp-2 max-w-[250px]">
+                {item.ourPosition || <span className="italic">—</span>}
+              </p>
+            }
+          />
+        );
+      
+      case 'currentRound':
+        return (
+          <Badge variant="outline" className="font-mono text-xs">
+            Round {item.currentRound || 0}
+          </Badge>
+        );
+      
+      case 'rationale':
+        return (
+          <PopoverTextEditor
+            value={item.rationale}
+            onSave={(value) => handleFieldChange(item, 'rationale', value)}
+            label="Edit Rationale"
+            placeholder="Enter negotiation rationale..."
             displayValue={
               <p className="text-sm text-muted-foreground line-clamp-2 max-w-[200px]">
-                {item.proposedChange || <span className="italic">—</span>}
+                {item.rationale || <span className="italic">—</span>}
               </p>
             }
           />

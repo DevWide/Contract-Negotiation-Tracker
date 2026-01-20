@@ -6,16 +6,32 @@ import type { Template, TemplateClause } from '@/types';
 import { sampleTemplates } from '@/data/sampleData';
 
 const STORAGE_KEY = 'negotiation-tracker-templates';
+const VERSION_KEY = 'negotiation-tracker-templates-version';
+const CURRENT_VERSION = 3; // Increment when sample template data changes - v3 for 3-Text Model
 
 function loadTemplates(): Template[] {
   try {
+    // Check version - if outdated, reset to sample data
+    const storedVersion = localStorage.getItem(VERSION_KEY);
+    if (storedVersion && parseInt(storedVersion) < CURRENT_VERSION) {
+      console.log('Template data version outdated, resetting to sample data');
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.setItem(VERSION_KEY, CURRENT_VERSION.toString());
+      return sampleTemplates;
+    }
+    
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
+      // Set version if not present
+      if (!storedVersion) {
+        localStorage.setItem(VERSION_KEY, CURRENT_VERSION.toString());
+      }
       return JSON.parse(stored);
     }
   } catch (e) {
     console.error('Failed to load templates from localStorage:', e);
   }
+  localStorage.setItem(VERSION_KEY, CURRENT_VERSION.toString());
   return sampleTemplates;
 }
 

@@ -161,10 +161,10 @@ export function NegotiationProvider({ children }: { children: React.ReactNode })
       items = items.filter(item =>
         item.clauseNumber.toLowerCase().includes(searchLower) ||
         item.issue.toLowerCase().includes(searchLower) ||
-        item.clauseText.toLowerCase().includes(searchLower) ||
-        item.proposedChange.toLowerCase().includes(searchLower) ||
-        item.counterProposal.toLowerCase().includes(searchLower) ||
-        item.counterproposalWording.toLowerCase().includes(searchLower)
+        (item.baselineText || '').toLowerCase().includes(searchLower) ||
+        (item.theirPosition || '').toLowerCase().includes(searchLower) ||
+        (item.ourPosition || '').toLowerCase().includes(searchLower) ||
+        (item.rationale || '').toLowerCase().includes(searchLower)
       );
     }
 

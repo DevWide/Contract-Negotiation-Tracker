@@ -1,7 +1,8 @@
 // Contract Negotiation Tracker - ClauseForm Component
 // Design: Refined Legal Elegance - Form for adding/editing clause items
+// Uses 3-Text Model: baselineText, theirPosition, ourPosition
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useNegotiation } from '@/contexts/NegotiationContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,9 +15,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { X, Save, Plus } from 'lucide-react';
-import type { ClauseItem, ClauseStatus, Priority, RiskLevel } from '@/types';
+import { X, Save, Plus, Info } from 'lucide-react';
+import type { ClauseItem, ClauseStatus, Priority, RiskLevel, PaperSource } from '@/types';
 
 interface ClauseFormProps {
   editingItem?: ClauseItem | null;
@@ -24,14 +35,38 @@ interface ClauseFormProps {
   onSaved?: () => void;
 }
 
+// Dynamic labels based on paper source
+const getFieldLabels = (paperSource: PaperSource) => {
+  if (paperSource === 'ours') {
+    return {
+      baseline: 'Our Template (Original Language)',
+      baselineDesc: 'Paste our original contract/template language here',
+      theirs: 'Their Markup (What They Changed)',
+      theirsDesc: "Paste counterparty's proposed changes or markup",
+      ours: 'Our Response (Accept/Reject/Counter)',
+      oursDesc: 'Enter our proposed response or counter-language',
+    };
+  } else {
+    return {
+      baseline: 'Their Contract (Original Language)',
+      baselineDesc: 'Paste their original contract language here',
+      theirs: 'Their Position (Latest Response)',
+      theirsDesc: "Counterparty's current stance (same as baseline in Round 1)",
+      ours: 'Our Redlines (What We Want)',
+      oursDesc: 'Enter our proposed redlines or counter-language',
+    };
+  }
+};
+
 const defaultFormData = {
   clauseNumber: '',
-  clauseText: '',
   topic: '',
   issue: '',
-  proposedChange: '',
-  counterProposal: '',
-  counterproposalWording: '',
+  rationale: '',
+  baselineText: '',
+  theirPosition: '',
+  ourPosition: '',
+  currentRound: 1,
   status: 'No Changes' as ClauseStatus,
   priority: 'Medium' as Priority,
   owner: 'Legal',
@@ -51,26 +86,55 @@ export function ClauseForm({ editingItem, onClose, onSaved }: ClauseFormProps) {
   } = useNegotiation();
 
   const [formData, setFormData] = useState(defaultFormData);
+  const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
+  const initialFormData = useRef(defaultFormData);
+  
+  // Get paper source for dynamic labels
+  const paperSource: PaperSource = activeContract?.paperSource || 'ours';
+  const labels = useMemo(() => getFieldLabels(paperSource), [paperSource]);
+
+  // Check if form has unsaved changes
+  const isDirty = useMemo(() => {
+    return JSON.stringify(formData) !== JSON.stringify(initialFormData.current);
+  }, [formData]);
+
+  // Handle close with unsaved changes check
+  const handleClose = useCallback(() => {
+    if (isDirty) {
+      setShowUnsavedWarning(true);
+    } else {
+      onClose();
+    }
+  }, [isDirty, onClose]);
+
+  const handleConfirmClose = () => {
+    setShowUnsavedWarning(false);
+    onClose();
+  };
 
   useEffect(() => {
     if (editingItem) {
-      setFormData({
+      const editData = {
         clauseNumber: editingItem.clauseNumber,
-        clauseText: editingItem.clauseText,
         topic: editingItem.topic,
         issue: editingItem.issue,
-        proposedChange: editingItem.proposedChange,
-        counterProposal: editingItem.counterProposal,
-        counterproposalWording: editingItem.counterproposalWording,
+        rationale: editingItem.rationale || '',
+        baselineText: editingItem.baselineText,
+        theirPosition: editingItem.theirPosition,
+        ourPosition: editingItem.ourPosition,
+        currentRound: editingItem.currentRound || 1,
         status: editingItem.status,
         priority: editingItem.priority,
         owner: editingItem.owner,
         impactCategory: editingItem.impactCategory,
         impactSubcategory: editingItem.impactSubcategory,
         riskLevel: editingItem.riskLevel,
-      });
+      };
+      setFormData(editData);
+      initialFormData.current = editData;
     } else {
       setFormData(defaultFormData);
+      initialFormData.current = defaultFormData;
     }
   }, [editingItem]);
 
@@ -104,7 +168,7 @@ export function ClauseForm({ editingItem, onClose, onSaved }: ClauseFormProps) {
           <CardTitle className="font-serif text-lg">
             {editingItem ? 'Edit Clause' : 'Add New Clause'}
           </CardTitle>
-          <Button variant="ghost" size="icon" onClick={onClose}>
+          <Button variant="ghost" size="icon" onClick={handleClose}>
             <X className="w-4 h-4" />
           </Button>
         </div>
@@ -112,7 +176,7 @@ export function ClauseForm({ editingItem, onClose, onSaved }: ClauseFormProps) {
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Row 1: Basic Info */}
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label htmlFor="clauseNumber">Clause Number</Label>
               <Input
@@ -133,64 +197,103 @@ export function ClauseForm({ editingItem, onClose, onSaved }: ClauseFormProps) {
                 required
               />
             </div>
-            <div className="space-y-2 md:col-span-3">
-              <Label htmlFor="issue">Issue *</Label>
+            <div className="space-y-2">
+              <Label htmlFor="currentRound">Round</Label>
               <Input
-                id="issue"
-                placeholder="Brief description of the negotiation issue"
-                value={formData.issue}
-                onChange={e => setFormData(prev => ({ ...prev, issue: e.target.value }))}
-                required
+                id="currentRound"
+                type="number"
+                min={1}
+                value={formData.currentRound}
+                onChange={e => setFormData(prev => ({ ...prev, currentRound: parseInt(e.target.value) || 1 }))}
+                className="font-mono"
               />
             </div>
           </div>
 
-          {/* Row 2: Original Clause Text */}
+          {/* Row 2: Baseline Text */}
           <div className="space-y-2">
-            <Label htmlFor="clauseText">Original Clause Text</Label>
+            <Label htmlFor="baselineText" className="flex items-center gap-2">
+              {labels.baseline}
+              {editingItem && (
+                <span className="text-xs text-muted-foreground flex items-center gap-1">
+                  <Info className="w-3 h-3" />
+                  Rarely changes after creation
+                </span>
+              )}
+            </Label>
             <Textarea
-              id="clauseText"
-              placeholder="Paste the original clause language here..."
-              value={formData.clauseText}
-              onChange={e => setFormData(prev => ({ ...prev, clauseText: e.target.value }))}
+              id="baselineText"
+              placeholder={labels.baselineDesc}
+              value={formData.baselineText}
+              onChange={e => setFormData(prev => ({ ...prev, baselineText: e.target.value }))}
               rows={4}
               className="font-serif text-sm"
             />
           </div>
 
-          {/* Row 3: Proposed Change */}
-          <div className="space-y-2">
-            <Label htmlFor="proposedChange">Proposed Change</Label>
-            <Textarea
-              id="proposedChange"
-              placeholder="Explain why this clause needs attention..."
-              value={formData.proposedChange}
-              onChange={e => setFormData(prev => ({ ...prev, proposedChange: e.target.value }))}
-              rows={2}
-            />
-          </div>
-
-          {/* Row 4: Counter-Proposal */}
+          {/* Row 3: Their Position & Our Position */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="counterProposal">Counter-Proposal Summary</Label>
+              <Label htmlFor="theirPosition">{labels.theirs}</Label>
               <Textarea
-                id="counterProposal"
-                placeholder="Brief summary of proposed changes..."
-                value={formData.counterProposal}
-                onChange={e => setFormData(prev => ({ ...prev, counterProposal: e.target.value }))}
-                rows={3}
+                id="theirPosition"
+                placeholder={labels.theirsDesc}
+                value={formData.theirPosition}
+                onChange={e => setFormData(prev => ({ ...prev, theirPosition: e.target.value }))}
+                rows={4}
+                className="font-serif text-sm"
+              />
+              {paperSource === 'counterparty' && !editingItem && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <input
+                    type="checkbox"
+                    id="copyBaseline"
+                    checked={formData.theirPosition === formData.baselineText && formData.baselineText !== ''}
+                    onChange={(e) => {
+                      if (e.target.checked && formData.baselineText) {
+                        setFormData(prev => ({ ...prev, theirPosition: prev.baselineText }));
+                      }
+                    }}
+                    className="rounded border-gray-300"
+                  />
+                  <label htmlFor="copyBaseline">Same as baseline (awaiting their response)</label>
+                </div>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="ourPosition">{labels.ours}</Label>
+              <Textarea
+                id="ourPosition"
+                placeholder={labels.oursDesc}
+                value={formData.ourPosition}
+                onChange={e => setFormData(prev => ({ ...prev, ourPosition: e.target.value }))}
+                rows={4}
+                className="font-serif text-sm"
+              />
+            </div>
+          </div>
+
+          {/* Row 4: Issue & Rationale */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="issue">Issue Summary *</Label>
+              <Textarea
+                id="issue"
+                placeholder="Brief summary of what's being negotiated..."
+                value={formData.issue}
+                onChange={e => setFormData(prev => ({ ...prev, issue: e.target.value }))}
+                rows={2}
+                required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="counterproposalWording">Counter-Proposal Wording</Label>
+              <Label htmlFor="rationale">Our Rationale</Label>
               <Textarea
-                id="counterproposalWording"
-                placeholder="Exact proposed language..."
-                value={formData.counterproposalWording}
-                onChange={e => setFormData(prev => ({ ...prev, counterproposalWording: e.target.value }))}
-                rows={3}
-                className="font-serif text-sm"
+                id="rationale"
+                placeholder="Why we're taking this position..."
+                value={formData.rationale}
+                onChange={e => setFormData(prev => ({ ...prev, rationale: e.target.value }))}
+                rows={2}
               />
             </div>
           </div>
@@ -307,7 +410,7 @@ export function ClauseForm({ editingItem, onClose, onSaved }: ClauseFormProps) {
 
           {/* Actions */}
           <div className="flex items-center justify-end gap-3 pt-4 border-t">
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button type="button" variant="outline" onClick={handleClose}>
               Cancel
             </Button>
             <Button 
@@ -329,6 +432,24 @@ export function ClauseForm({ editingItem, onClose, onSaved }: ClauseFormProps) {
           </div>
         </form>
       </CardContent>
+
+      {/* Unsaved Changes Warning Dialog */}
+      <AlertDialog open={showUnsavedWarning} onOpenChange={setShowUnsavedWarning}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Unsaved Changes</AlertDialogTitle>
+            <AlertDialogDescription>
+              You have unsaved changes. Are you sure you want to close without saving?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Continue Editing</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmClose} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Discard Changes
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 }

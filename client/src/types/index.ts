@@ -20,6 +20,10 @@ export interface TimelineEvent {
 // Party who made this version in negotiation
 export type NegotiationParty = 'us' | 'them' | 'original';
 
+/**
+ * 3-Text Model Version Snapshot
+ * Captures the state of all 3 texts at a point in time
+ */
 export interface ClauseVersion {
   id: string;
   clauseItemId: number;
@@ -29,12 +33,13 @@ export interface ClauseVersion {
   round?: number;              // Negotiation round number (1, 2, 3...)
   party?: NegotiationParty;    // Who made this version
   
-  // Snapshot of all negotiable fields
-  clauseText: string;
-  proposedChange?: string;     // What they proposed to change
-  counterProposal?: string;    // Our response summary
-  counterproposalWording: string;
+  // ===== THE 3 TEXTS SNAPSHOT =====
+  baselineText: string;        // Starting point snapshot
+  theirPosition: string;       // Their position at this round
+  ourPosition: string;         // Our position at this round
   
+  // State at this point
+  status?: ClauseStatus;
   timestamp: string;
   notes?: string;              // Optional notes about this round
 }
@@ -49,23 +54,47 @@ export interface Annotation {
   timestamp: string;
 }
 
+/**
+ * 3-Text Model Clause Item
+ * 
+ * The 3 core texts:
+ * - baselineText: Starting point (rarely changes after creation)
+ * - theirPosition: Counterparty's current proposed text
+ * - ourPosition: Our current proposed text/response
+ * 
+ * For "Our Paper": Baseline = Our template, Theirs = Their markup, Ours = Our response
+ * For "Their Paper": Baseline = Their contract, Theirs = Their stance, Ours = Our redlines
+ */
 export interface ClauseItem {
   id: number;
   clauseNumber: string;
-  clauseText: string;
-  topic: string; // Topic/category of the clause
-  issue: string; // Specific issue being negotiated
-  proposedChange: string;
-  counterProposal: string;
-  counterproposalWording: string;
+  topic: string;                // Topic/category of the clause
+  
+  // ===== THE 3 TEXTS (Core of negotiation) =====
+  baselineText: string;         // Starting point - rarely changes
+  theirPosition: string;        // Their current proposed text
+  ourPosition: string;          // Our current proposed text/response
+  
+  // ===== HUMAN-READABLE CONTEXT =====
+  issue: string;                // What's being negotiated (summary)
+  rationale?: string;           // Why we're taking our position
+  
+  // ===== ROUND & STATE =====
+  currentRound?: number;        // Current negotiation round (default: 1)
   status: ClauseStatus;
   priority: Priority;
   owner: string;
+  
+  // ===== RISK & IMPACT =====
+  riskLevel: RiskLevel;
   impactCategory: string;
   impactSubcategory: string;
-  riskLevel: RiskLevel;
+  
+  // ===== TEMPLATE REFERENCE =====
   templateId?: string;
   templateClauseId?: string;
+  
+  // ===== HISTORY =====
   versions?: ClauseVersion[];
   annotations?: Annotation[];
 }
@@ -84,16 +113,24 @@ export interface Contract {
   timeline: TimelineEvent[];
 }
 
+/**
+ * 3-Text Model Template Clause
+ */
 export interface TemplateClause {
   id: string;
   clauseNumber: string;
   topic: string;
-  clauseText: string;
-  issue: string;
-  rationale: string;
-  proposedChange: string;
-  counterProposal: string;
-  counterproposalWording: string;
+  
+  // ===== THE 3 TEXTS =====
+  baselineText: string;         // Template's default text
+  theirPosition: string;        // Expected counterparty position
+  ourPosition: string;          // Our standard counter-position
+  
+  // ===== CONTEXT =====
+  issue: string;                // What this clause typically negotiates
+  rationale: string;            // Why we take this position
+  
+  // ===== IMPACT =====
   impactCategory: string;
   impactSubcategory: string;
 }
