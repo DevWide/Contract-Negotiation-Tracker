@@ -79,7 +79,7 @@ export function DashboardStats({ onStatusFilter, activeStatusFilter }: Dashboard
       label: 'Total Clauses', 
       value: stats.total, 
       icon: FileText,
-      color: 'text-[#BED7FF]',
+      color: 'text-[#424468]',
       bgColor: 'bg-[oklch(0.94_0.03_250)]',
       filterValue: null, // null means show all
     },
@@ -208,13 +208,19 @@ export function DashboardStats({ onStatusFilter, activeStatusFilter }: Dashboard
                 {stats.total > 0 ? (
                   <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
                     {(() => {
-                      const total = stats.total;
                       const circumference = 2 * Math.PI * 40; // 251.2 approx
                       
-                      // Calculate percentages
-                      const highPct = stats.byPriority.High / total;
-                      const mediumPct = stats.byPriority.Medium / total;
-                      const lowPct = stats.byPriority.Low / total;
+                      // Use sum of priorities as total to ensure chart is always complete
+                      const priorityTotal = stats.byPriority.High + stats.byPriority.Medium + stats.byPriority.Low;
+                      
+                      if (priorityTotal === 0) {
+                        return null; // No priority data
+                      }
+                      
+                      // Calculate percentages based on priority total
+                      const highPct = stats.byPriority.High / priorityTotal;
+                      const mediumPct = stats.byPriority.Medium / priorityTotal;
+                      const lowPct = stats.byPriority.Low / priorityTotal;
                       
                       // Build segments array with only non-zero values
                       const prioritySegments = [
