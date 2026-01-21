@@ -43,6 +43,8 @@ export default function Home() {
     setActiveContractId,
     deleteClauseItem,
     setEditingItemId,
+    setFilterState,
+    filterState,
   } = useNegotiation();
 
   // Modal states
@@ -53,8 +55,13 @@ export default function Home() {
   const [showNewContractDialog, setShowNewContractDialog] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   
+  // Dashboard status filter tracking
+  const [dashboardStatusFilter, setDashboardStatusFilter] = useState<string | null>(null);
+  
   // Ref for the form area - used to scroll when editing
   const formAreaRef = useRef<HTMLDivElement>(null);
+  // Ref for clause section - used to scroll when filtering from dashboard
+  const clauseSectionRef = useRef<HTMLDivElement>(null);
   
   // View/Edit states
   const [viewingItem, setViewingItem] = useState<ClauseItem | null>(null);
@@ -88,8 +95,29 @@ export default function Home() {
       setViewingItem(null);
       setEditingItem(null);
       setComparingItem(null);
+      // Clear dashboard status filter and reset to show all
+      if (dashboardStatusFilter !== null) {
+        setDashboardStatusFilter(null);
+        setFilterState(prev => ({ ...prev, status: 'all' }));
+      }
     },
   });
+
+  // Handler for dashboard status card clicks
+  const handleDashboardStatusFilter = useCallback((status: string | null) => {
+    setDashboardStatusFilter(status);
+    if (status === null) {
+      // "Total Clauses" clicked - show all
+      setFilterState(prev => ({ ...prev, status: 'all' }));
+    } else {
+      // Specific status clicked - filter by that status
+      setFilterState(prev => ({ ...prev, status: status as any }));
+    }
+    // Scroll to clause section
+    setTimeout(() => {
+      clauseSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+  }, [setFilterState]);
 
   const handleViewItem = useCallback((item: ClauseItem) => {
     setViewingItem(item);
@@ -271,7 +299,10 @@ export default function Home() {
           </button>
           {showStats && (
             <SectionErrorBoundary sectionName="Dashboard">
-              <DashboardStats />
+              <DashboardStats 
+                onStatusFilter={handleDashboardStatusFilter}
+                activeStatusFilter={dashboardStatusFilter}
+              />
             </SectionErrorBoundary>
           )}
         </section>
@@ -293,9 +324,16 @@ export default function Home() {
         </section>
 
         {/* Clause Management */}
-        <section className="space-y-4">
+        <section ref={clauseSectionRef} className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="font-serif text-xl font-semibold">Clause Items</h2>
+            <h2 className="font-serif text-xl font-semibold">
+              Clause Items
+              {dashboardStatusFilter && (
+                <span className="ml-2 text-sm font-normal text-muted-foreground">
+                  (filtered by: {dashboardStatusFilter} • press Esc to clear)
+                </span>
+              )}
+            </h2>
             <Button 
               onClick={() => setShowAddForm(true)}
               className="bg-[oklch(0.45_0.08_160)] hover:bg-[oklch(0.50_0.08_160)]"

@@ -14,7 +14,12 @@ import {
   Minus
 } from 'lucide-react';
 
-export function DashboardStats() {
+interface DashboardStatsProps {
+  onStatusFilter?: (status: string | null) => void;
+  activeStatusFilter?: string | null;
+}
+
+export function DashboardStats({ onStatusFilter, activeStatusFilter }: DashboardStatsProps) {
   const { activeContract } = useNegotiation();
 
   const stats = useMemo(() => {
@@ -74,8 +79,9 @@ export function DashboardStats() {
       label: 'Total Clauses', 
       value: stats.total, 
       icon: FileText,
-      color: 'text-[oklch(0.45_0.08_160)]',
-      bgColor: 'bg-[oklch(0.94_0.03_160)]',
+      color: 'text-[#BED7FF]',
+      bgColor: 'bg-[oklch(0.94_0.03_250)]',
+      filterValue: null, // null means show all
     },
     { 
       label: 'Agreed', 
@@ -83,6 +89,7 @@ export function DashboardStats() {
       icon: CheckCircle2,
       color: 'text-[oklch(0.35_0.08_160)]',
       bgColor: 'bg-[oklch(0.92_0.04_160)]',
+      filterValue: 'Agreed',
     },
     { 
       label: 'In Discussion', 
@@ -90,6 +97,7 @@ export function DashboardStats() {
       icon: MessageSquare,
       color: 'text-[oklch(0.40_0.06_280)]',
       bgColor: 'bg-[oklch(0.92_0.04_280)]',
+      filterValue: 'In Discussion',
     },
     { 
       label: 'Escalated', 
@@ -97,6 +105,7 @@ export function DashboardStats() {
       icon: AlertTriangle,
       color: 'text-[oklch(0.50_0.10_55)]',
       bgColor: 'bg-[oklch(0.92_0.05_55)]',
+      filterValue: 'Escalated',
     },
     { 
       label: 'Blocked', 
@@ -104,6 +113,7 @@ export function DashboardStats() {
       icon: AlertOctagon,
       color: 'text-[oklch(0.45_0.10_15)]',
       bgColor: 'bg-[oklch(0.92_0.05_15)]',
+      filterValue: 'Blocked',
     },
     { 
       label: 'No Changes', 
@@ -111,6 +121,7 @@ export function DashboardStats() {
       icon: Minus,
       color: 'text-[oklch(0.50_0.02_80)]',
       bgColor: 'bg-[oklch(0.94_0.01_80)]',
+      filterValue: 'No Changes',
     },
   ];
 
@@ -118,21 +129,33 @@ export function DashboardStats() {
     <div className="space-y-4">
       {/* Status Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-        {statusCards.map(({ label, value, icon: Icon, color, bgColor }) => (
-          <Card key={label} className="border shadow-sm">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-lg ${bgColor} flex items-center justify-center`}>
-                  <Icon className={`w-5 h-5 ${color}`} />
+        {statusCards.map(({ label, value, icon: Icon, color, bgColor, filterValue }) => {
+          const isActive = activeStatusFilter === filterValue || 
+            (activeStatusFilter === null && filterValue === null);
+          const isClickable = onStatusFilter !== undefined;
+          
+          return (
+            <Card 
+              key={label} 
+              className={`border shadow-sm transition-all ${
+                isClickable ? 'cursor-pointer hover:shadow-md hover:border-primary/50' : ''
+              } ${isActive && activeStatusFilter !== undefined ? 'ring-2 ring-primary ring-offset-2' : ''}`}
+              onClick={() => isClickable && onStatusFilter(filterValue)}
+            >
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-lg ${bgColor} flex items-center justify-center`}>
+                    <Icon className={`w-5 h-5 ${color}`} />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-semibold font-serif">{value}</p>
+                    <p className="text-xs text-muted-foreground">{label}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-2xl font-semibold font-serif">{value}</p>
-                  <p className="text-xs text-muted-foreground">{label}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
 
       {/* Progress & Priority Distribution */}
