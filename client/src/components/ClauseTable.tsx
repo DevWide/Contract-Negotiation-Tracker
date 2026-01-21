@@ -341,7 +341,7 @@ export function ClauseTable({
             value={item.clauseNumber}
             onSave={(value) => handleFieldChange(item, 'clauseNumber', value)}
             placeholder="e.g., 5.1"
-            className="font-mono text-sm font-medium text-[oklch(0.25_0.05_250)]"
+            className="font-mono text-sm font-medium text-[oklch(0.45_0.08_160)]"
           />
         );
       

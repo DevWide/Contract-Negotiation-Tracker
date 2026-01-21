@@ -53,10 +53,10 @@ export function EmptyState({ onCreateContract }: EmptyStateProps) {
       <div className="max-w-3xl w-full text-center">
         {/* Hero */}
         <div className="mb-12">
-          <div className="w-20 h-20 rounded-2xl bg-[oklch(0.60_0.14_75)] flex items-center justify-center mx-auto mb-6 shadow-lg">
+          <div className="w-20 h-20 rounded-2xl bg-[oklch(0.55_0.12_45)] flex items-center justify-center mx-auto mb-6 shadow-lg">
             <Scale className="w-10 h-10 text-[oklch(0.15_0.03_250)]" />
           </div>
-          <h1 className="font-serif text-4xl font-semibold text-[oklch(0.22_0.04_250)] mb-4">
+          <h1 className="font-serif text-4xl font-semibold text-[oklch(0.28_0.06_160)] mb-4">
             Contract Negotiation Tracker
           </h1>
           <p className="text-lg text-muted-foreground max-w-xl mx-auto">
@@ -71,7 +71,7 @@ export function EmptyState({ onCreateContract }: EmptyStateProps) {
             <Button 
               size="lg"
               onClick={onCreateContract}
-              className="bg-[oklch(0.25_0.05_250)] hover:bg-[oklch(0.30_0.05_250)] text-white px-8 py-6 text-lg"
+              className="bg-[oklch(0.45_0.08_160)] hover:bg-[oklch(0.50_0.08_160)] text-white px-8 py-6 text-lg"
             >
               <Plus className="w-5 h-5 mr-2" />
               Create New Contract
@@ -81,7 +81,7 @@ export function EmptyState({ onCreateContract }: EmptyStateProps) {
                 size="lg"
                 variant="outline"
                 onClick={() => setShowFromTemplateDialog(true)}
-                className="px-8 py-6 text-lg border-[oklch(0.60_0.14_75)] text-[oklch(0.50_0.12_75)] hover:bg-[oklch(0.92_0.06_75)]"
+                className="px-8 py-6 text-lg border-[oklch(0.55_0.12_45)] text-[oklch(0.50_0.10_45)] hover:bg-[oklch(0.93_0.05_45)]"
               >
                 <Library className="w-5 h-5 mr-2" />
                 From Template
@@ -102,7 +102,7 @@ export function EmptyState({ onCreateContract }: EmptyStateProps) {
               <CardContent className="p-6">
                 <div className="flex items-start gap-4">
                   <div className="w-10 h-10 rounded-lg bg-[oklch(0.94_0.02_250)] flex items-center justify-center shrink-0">
-                    <feature.icon className="w-5 h-5 text-[oklch(0.25_0.05_250)]" />
+                    <feature.icon className="w-5 h-5 text-[oklch(0.45_0.08_160)]" />
                   </div>
                   <div>
                     <h3 className="font-medium mb-1">{feature.title}</h3>

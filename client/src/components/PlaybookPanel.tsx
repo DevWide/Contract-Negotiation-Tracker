@@ -66,7 +66,7 @@ export function PlaybookPanel() {
           <CollapsibleTrigger asChild>
             <button className="w-full flex items-center justify-between hover:bg-accent/50 -mx-6 -my-4 px-6 py-4 rounded-t-lg transition-colors">
               <CardTitle className="font-serif text-lg flex items-center gap-2">
-                <BookOpen className="w-5 h-5 text-[oklch(0.60_0.14_75)]" />
+                <BookOpen className="w-5 h-5 text-[oklch(0.55_0.12_45)]" />
                 Negotiation Playbook
               </CardTitle>
               <div className="flex items-center gap-2">
@@ -153,7 +153,7 @@ export function PlaybookPanel() {
                                     {topic.positions.map(pos => (
                                       <div key={pos.id} className="bg-background rounded-lg p-3 border">
                                         <div className="flex items-start gap-2 mb-2">
-                                          <Lightbulb className="w-4 h-4 text-[oklch(0.60_0.14_75)] mt-0.5" />
+                                          <Lightbulb className="w-4 h-4 text-[oklch(0.55_0.12_45)] mt-0.5" />
                                           <p className="font-medium text-sm">{pos.position}</p>
                                         </div>
                                         <p className="text-xs text-muted-foreground mb-2 ml-6">

@@ -207,8 +207,8 @@ export default function Home() {
                   <label 
                     className={`flex flex-col items-center gap-2 p-4 border rounded-lg cursor-pointer transition-all ${
                       newContractForm.paperSource === 'ours' 
-                        ? 'border-[oklch(0.60_0.14_75)] bg-[oklch(0.92_0.06_75)]' 
-                        : 'border-border hover:border-[oklch(0.60_0.14_75)]/50'
+                        ? 'border-[oklch(0.55_0.12_45)] bg-[oklch(0.93_0.05_45)]' 
+                        : 'border-border hover:border-[oklch(0.55_0.12_45)]/50'
                     }`}
                   >
                     <RadioGroupItem value="ours" className="sr-only" />
@@ -220,8 +220,8 @@ export default function Home() {
                   <label 
                     className={`flex flex-col items-center gap-2 p-4 border rounded-lg cursor-pointer transition-all ${
                       newContractForm.paperSource === 'counterparty' 
-                        ? 'border-[oklch(0.60_0.14_75)] bg-[oklch(0.92_0.06_75)]' 
-                        : 'border-border hover:border-[oklch(0.60_0.14_75)]/50'
+                        ? 'border-[oklch(0.55_0.12_45)] bg-[oklch(0.93_0.05_45)]' 
+                        : 'border-border hover:border-[oklch(0.55_0.12_45)]/50'
                     }`}
                   >
                     <RadioGroupItem value="counterparty" className="sr-only" />
@@ -240,7 +240,7 @@ export default function Home() {
               <Button 
                 onClick={handleCreateContract}
                 disabled={!newContractForm.name.trim()}
-                className="bg-[oklch(0.25_0.05_250)] hover:bg-[oklch(0.30_0.05_250)]"
+                className="bg-[oklch(0.45_0.08_160)] hover:bg-[oklch(0.50_0.08_160)]"
               >
                 Create Contract
               </Button>
@@ -298,7 +298,7 @@ export default function Home() {
             <h2 className="font-serif text-xl font-semibold">Clause Items</h2>
             <Button 
               onClick={() => setShowAddForm(true)}
-              className="bg-[oklch(0.25_0.05_250)] hover:bg-[oklch(0.30_0.05_250)]"
+              className="bg-[oklch(0.45_0.08_160)] hover:bg-[oklch(0.50_0.08_160)]"
             >
               <Plus className="w-4 h-4 mr-2" />
               Add Clause

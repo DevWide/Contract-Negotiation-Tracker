@@ -490,7 +490,7 @@ export function ComparisonModal({ item, open, onClose }: ComparisonModalProps) {
                     <div 
                       key={version.id} 
                       className={`p-4 border rounded-lg ${
-                        selectedVersionId === version.id ? 'border-[oklch(0.60_0.14_75)] bg-[oklch(0.92_0.06_75)]/30' : ''
+                        selectedVersionId === version.id ? 'border-[oklch(0.55_0.12_45)] bg-[oklch(0.93_0.05_45)]/30' : ''
                       }`}
                     >
                       <div className="flex items-center justify-between mb-2">

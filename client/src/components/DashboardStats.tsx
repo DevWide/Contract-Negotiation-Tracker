@@ -74,7 +74,7 @@ export function DashboardStats() {
       label: 'Total Clauses', 
       value: stats.total, 
       icon: FileText,
-      color: 'text-[oklch(0.25_0.05_250)]',
+      color: 'text-[oklch(0.45_0.08_160)]',
       bgColor: 'bg-[oklch(0.94_0.02_250)]',
     },
     { 

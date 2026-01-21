@@ -40,10 +40,10 @@ import {
 import type { TimelineEvent } from '@/types';
 
 const eventTypes = [
-  { value: 'Created', icon: FileText, color: 'bg-[oklch(0.25_0.05_250)]' },
+  { value: 'Created', icon: FileText, color: 'bg-[oklch(0.45_0.08_160)]' },
   { value: 'Sent', icon: Send, color: 'bg-[oklch(0.50_0.10_240)]' },
   { value: 'Received', icon: MessageSquare, color: 'bg-[oklch(0.45_0.12_145)]' },
-  { value: 'Meeting', icon: Users, color: 'bg-[oklch(0.60_0.14_75)]' },
+  { value: 'Meeting', icon: Users, color: 'bg-[oklch(0.55_0.12_45)]' },
   { value: 'Review', icon: Clock, color: 'bg-[oklch(0.55_0.15_55)]' },
   { value: 'Escalated', icon: AlertTriangle, color: 'bg-[oklch(0.55_0.15_55)]' },
   { value: 'Agreed', icon: CheckCircle, color: 'bg-[oklch(0.45_0.12_145)]' },
@@ -150,7 +150,7 @@ export function Timeline() {
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="font-serif text-lg flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-[oklch(0.60_0.14_75)]" />
+            <Calendar className="w-5 h-5 text-[oklch(0.55_0.12_45)]" />
             Negotiation Timeline
           </CardTitle>
           <Button size="sm" onClick={() => setShowAddDialog(true)}>
@@ -280,7 +280,7 @@ export function Timeline() {
             <Button 
               onClick={handleAddEvent}
               disabled={!newEvent.description.trim()}
-              className="bg-[oklch(0.25_0.05_250)] hover:bg-[oklch(0.30_0.05_250)]"
+              className="bg-[oklch(0.45_0.08_160)] hover:bg-[oklch(0.50_0.08_160)]"
             >
               Add Event
             </Button>
@@ -413,7 +413,7 @@ export function Timeline() {
                   <Button 
                     onClick={handleSaveEdit}
                     disabled={!editEvent.description.trim()}
-                    className="bg-[oklch(0.25_0.05_250)] hover:bg-[oklch(0.30_0.05_250)]"
+                    className="bg-[oklch(0.45_0.08_160)] hover:bg-[oklch(0.50_0.08_160)]"
                   >
                     Save Changes
                   </Button>

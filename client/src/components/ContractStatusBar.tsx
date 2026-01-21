@@ -45,7 +45,7 @@ export function ContractStatusBar() {
             <button className="w-full flex items-center justify-between py-3 hover:bg-accent/50 transition-colors -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2">
-                  <FileText className="w-5 h-5 text-[oklch(0.60_0.14_75)]" />
+                  <FileText className="w-5 h-5 text-[oklch(0.55_0.12_45)]" />
                   <span className="font-serif font-semibold text-lg">{activeContract.name}</span>
                 </div>
                 {activeContract.counterparty && (
@@ -60,7 +60,7 @@ export function ContractStatusBar() {
                   variant="outline" 
                   className={`${
                     activeContract.paperSource === 'ours' 
-                      ? 'border-[oklch(0.60_0.14_75)] text-[oklch(0.50_0.12_75)] bg-[oklch(0.92_0.06_75)]'
+                      ? 'border-[oklch(0.55_0.12_45)] text-[oklch(0.50_0.10_45)] bg-[oklch(0.93_0.05_45)]'
                       : 'border-[oklch(0.50_0.10_240)] text-[oklch(0.40_0.08_240)] bg-[oklch(0.92_0.05_240)]'
                   }`}
                 >
@@ -111,7 +111,7 @@ export function ContractStatusBar() {
                 <div className="flex items-start gap-2">
                   <FileText className={`w-5 h-5 mt-0.5 ${
                     activeContract.paperSource === 'ours' 
-                      ? 'text-[oklch(0.60_0.14_75)]' 
+                      ? 'text-[oklch(0.55_0.12_45)]' 
                       : 'text-[oklch(0.50_0.10_240)]'
                   }`} />
                   <div>

@@ -86,7 +86,7 @@ export function NewContractFromTemplateDialog({
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle className="font-serif text-xl flex items-center gap-2">
-            <Library className="w-5 h-5 text-[oklch(0.60_0.14_75)]" />
+            <Library className="w-5 h-5 text-[oklch(0.55_0.12_45)]" />
             New Contract from Template
           </DialogTitle>
           <DialogDescription>
@@ -186,7 +186,7 @@ export function NewContractFromTemplateDialog({
           <Button 
             onClick={handleCreate}
             disabled={!canCreate}
-            className="bg-[oklch(0.25_0.05_250)] hover:bg-[oklch(0.30_0.05_250)]"
+            className="bg-[oklch(0.45_0.08_160)] hover:bg-[oklch(0.50_0.08_160)]"
           >
             Create Contract
           </Button>

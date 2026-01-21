@@ -1,5 +1,5 @@
 // Contract Negotiation Tracker - Header Component
-// Design: Refined Legal Elegance - Deep navy with gold accents
+// Design: Organic Modern Professional - Deep sage with terracotta accents
 
 import { useState } from 'react';
 import { useNegotiation } from '@/contexts/NegotiationContext';
@@ -142,12 +142,12 @@ export function Header({ onOpenSettings, onOpenTemplates }: HeaderProps) {
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-[oklch(0.22_0.04_250)] text-white shadow-lg">
+      <header className="sticky top-0 z-50 bg-[oklch(0.28_0.06_160)] text-white shadow-lg">
         <div className="container flex items-center justify-between h-16">
           {/* Logo & Title */}
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-[#FAF9F5] flex items-center justify-center">
-              <Scale className="w-6 h-6 text-[oklch(0.22_0.04_250)]" />
+              <Scale className="w-6 h-6 text-[oklch(0.28_0.06_160)]" />
             </div>
             <div>
               <h1 className="text-lg font-serif font-semibold tracking-tight">
@@ -375,8 +375,8 @@ export function Header({ onOpenSettings, onOpenTemplates }: HeaderProps) {
                 <label 
                   className={`flex flex-col items-center gap-2 p-4 border rounded-lg cursor-pointer transition-all ${
                     newContractForm.paperSource === 'ours' 
-                      ? 'border-[oklch(0.60_0.14_75)] bg-[oklch(0.92_0.06_75)]' 
-                      : 'border-border hover:border-[oklch(0.60_0.14_75)]/50'
+                      ? 'border-[oklch(0.55_0.12_45)] bg-[oklch(0.93_0.05_45)]' 
+                      : 'border-border hover:border-[oklch(0.55_0.12_45)]/50'
                   }`}
                 >
                   <RadioGroupItem value="ours" className="sr-only" />
@@ -388,8 +388,8 @@ export function Header({ onOpenSettings, onOpenTemplates }: HeaderProps) {
                 <label 
                   className={`flex flex-col items-center gap-2 p-4 border rounded-lg cursor-pointer transition-all ${
                     newContractForm.paperSource === 'counterparty' 
-                      ? 'border-[oklch(0.60_0.14_75)] bg-[oklch(0.92_0.06_75)]' 
-                      : 'border-border hover:border-[oklch(0.60_0.14_75)]/50'
+                      ? 'border-[oklch(0.55_0.12_45)] bg-[oklch(0.93_0.05_45)]' 
+                      : 'border-border hover:border-[oklch(0.55_0.12_45)]/50'
                   }`}
                 >
                   <RadioGroupItem value="counterparty" className="sr-only" />
@@ -439,7 +439,7 @@ export function Header({ onOpenSettings, onOpenTemplates }: HeaderProps) {
             <Button 
               onClick={handleCreateContract}
               disabled={!newContractForm.name.trim()}
-              className="bg-[oklch(0.25_0.05_250)] hover:bg-[oklch(0.30_0.05_250)]"
+              className="bg-primary hover:bg-primary/90"
             >
               Create Contract
             </Button>

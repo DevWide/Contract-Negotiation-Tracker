@@ -129,12 +129,12 @@ export function PlaybookModal({ item, open, onClose }: PlaybookModalProps) {
   };
 
   const renderTopicCard = (topic: PlaybookTopic, isRelevant: boolean = false) => (
-    <div key={topic.id} className={`border rounded-lg p-4 ${isRelevant ? 'bg-[oklch(0.92_0.06_75)]/30 border-[oklch(0.70_0.10_75)]' : 'bg-muted/20'}`}>
+    <div key={topic.id} className={`border rounded-lg p-4 ${isRelevant ? 'bg-[oklch(0.93_0.05_45)]/30 border-[oklch(0.70_0.10_75)]' : 'bg-muted/20'}`}>
       <div className="flex items-start justify-between mb-2">
         <div>
           <h4 className="font-medium">{topic.title}</h4>
           {isRelevant && (
-            <Badge variant="outline" className="text-xs mt-1 bg-[oklch(0.92_0.06_75)] text-[oklch(0.40_0.10_75)] border-[oklch(0.70_0.10_75)]">
+            <Badge variant="outline" className="text-xs mt-1 bg-[oklch(0.93_0.05_45)] text-[oklch(0.40_0.10_75)] border-[oklch(0.70_0.10_75)]">
               Relevant to this clause
             </Badge>
           )}
@@ -191,7 +191,7 @@ export function PlaybookModal({ item, open, onClose }: PlaybookModalProps) {
             {topic.positions.map(pos => (
               <div key={pos.id} className="bg-background rounded-lg p-3 border">
                 <div className="flex items-start gap-2 mb-2">
-                  <Lightbulb className="w-4 h-4 text-[oklch(0.60_0.14_75)] mt-0.5" />
+                  <Lightbulb className="w-4 h-4 text-[oklch(0.55_0.12_45)] mt-0.5" />
                   <p className="font-medium text-sm">{pos.position}</p>
                 </div>
                 <p className="text-xs text-muted-foreground mb-2 ml-6">
@@ -240,7 +240,7 @@ export function PlaybookModal({ item, open, onClose }: PlaybookModalProps) {
         <DialogHeader className="flex-shrink-0 pb-2">
           <div className="flex items-center justify-between">
             <DialogTitle className="font-serif text-xl flex items-center gap-2">
-              <BookOpen className="w-5 h-5 text-[oklch(0.60_0.14_75)]" />
+              <BookOpen className="w-5 h-5 text-[oklch(0.55_0.12_45)]" />
               Negotiation Playbook
             </DialogTitle>
             <div className="flex items-center gap-2">
@@ -290,7 +290,7 @@ export function PlaybookModal({ item, open, onClose }: PlaybookModalProps) {
             {relevantTopics.length > 0 && (
               <div>
                 <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
-                  <Target className="w-4 h-4 text-[oklch(0.60_0.14_75)]" />
+                  <Target className="w-4 h-4 text-[oklch(0.55_0.12_45)]" />
                   Relevant Guidance ({relevantTopics.length})
                 </h3>
                 <div className="space-y-4">

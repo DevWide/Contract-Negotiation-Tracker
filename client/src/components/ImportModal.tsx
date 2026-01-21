@@ -96,7 +96,7 @@ export function ImportModal({ open, onClose }: ImportModalProps) {
         <div className="flex-1 overflow-hidden space-y-4">
           {/* File Upload */}
           <div 
-            className="border-2 border-dashed rounded-lg p-8 text-center cursor-pointer hover:border-[oklch(0.60_0.14_75)] transition-colors"
+            className="border-2 border-dashed rounded-lg p-8 text-center cursor-pointer hover:border-[oklch(0.55_0.12_45)] transition-colors"
             onClick={() => fileInputRef.current?.click()}
           >
             <input
@@ -116,7 +116,7 @@ export function ImportModal({ open, onClose }: ImportModalProps) {
           {/* File Info */}
           {fileName && (
             <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
-              <FileText className="w-5 h-5 text-[oklch(0.60_0.14_75)]" />
+              <FileText className="w-5 h-5 text-[oklch(0.55_0.12_45)]" />
               <span className="font-medium">{fileName}</span>
               {parsedItems.length > 0 && (
                 <span className="text-sm text-muted-foreground">
@@ -186,7 +186,7 @@ export function ImportModal({ open, onClose }: ImportModalProps) {
           <Button 
             onClick={handleImport}
             disabled={parsedItems.length === 0}
-            className="bg-[oklch(0.25_0.05_250)] hover:bg-[oklch(0.30_0.05_250)]"
+            className="bg-[oklch(0.45_0.08_160)] hover:bg-[oklch(0.50_0.08_160)]"
           >
             Import {parsedItems.length} Clauses
           </Button>
