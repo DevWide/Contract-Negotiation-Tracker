@@ -1,5 +1,5 @@
 // Contract Negotiation Tracker - ClauseTable Component
-// Design: Refined Legal Elegance - Main data table with full inline editing
+// Design: Organic Modern Professional - Main data table with full inline editing
 
 import { useState, useRef, useEffect } from 'react';
 import { useNegotiation } from '@/contexts/NegotiationContext';
@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import {
   Table,
   TableBody,
@@ -19,6 +20,7 @@ import {
   Select,
   SelectContent,
   SelectItem,
+  SelectSeparator,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
@@ -33,6 +35,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { 
   ArrowUpDown, 
   MoreHorizontal, 
@@ -254,7 +264,12 @@ export function ClauseTable({
     addImpactCategory,
     addSubcategory,
     getSubcategories,
+    addOwner,
   } = useNegotiation();
+
+  const [showAddOwnerDialog, setShowAddOwnerDialog] = useState(false);
+  const [newOwnerName, setNewOwnerName] = useState('');
+  const [pendingOwnerItem, setPendingOwnerItem] = useState<ClauseItem | null>(null);
 
   if (!activeContract) return null;
 
@@ -409,7 +424,14 @@ export function ClauseTable({
         return (
           <Select
             value={item.owner}
-            onValueChange={(value: string) => handleFieldChange(item, 'owner', value)}
+            onValueChange={(value: string) => {
+              if (value === '__add_new__') {
+                setPendingOwnerItem(item);
+                setShowAddOwnerDialog(true);
+              } else {
+                handleFieldChange(item, 'owner', value);
+              }
+            }}
           >
             <SelectTrigger className="h-8 w-[110px] text-sm">
               <SelectValue />
@@ -418,6 +440,13 @@ export function ClauseTable({
               {formOptions.owners.map(owner => (
                 <SelectItem key={owner} value={owner}>{owner}</SelectItem>
               ))}
+              <SelectSeparator />
+              <SelectItem value="__add_new__" className="text-muted-foreground italic">
+                <span className="flex items-center gap-1.5">
+                  <Plus className="w-3.5 h-3.5" />
+                  Add new...
+                </span>
+              </SelectItem>
             </SelectContent>
           </Select>
         );
@@ -689,6 +718,65 @@ export function ClauseTable({
         <Pencil className="w-3 h-3" />
         <span>Click on any cell to edit inline. Press Enter to save, Escape to cancel.</span>
       </div>
+
+      {/* Add New Owner Dialog */}
+      <Dialog open={showAddOwnerDialog} onOpenChange={setShowAddOwnerDialog}>
+        <DialogContent className="sm:max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle>Add New Owner</DialogTitle>
+            <DialogDescription>
+              Add a new owner option for clause assignments.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Label htmlFor="clause-new-owner-name">Owner Name</Label>
+            <Input
+              id="clause-new-owner-name"
+              value={newOwnerName}
+              onChange={(e) => setNewOwnerName(e.target.value)}
+              placeholder="e.g., Marketing, Engineering..."
+              className="mt-2"
+              autoFocus
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && newOwnerName.trim()) {
+                  addOwner(newOwnerName.trim());
+                  if (pendingOwnerItem) {
+                    handleFieldChange(pendingOwnerItem, 'owner', newOwnerName.trim());
+                  }
+                  setNewOwnerName('');
+                  setPendingOwnerItem(null);
+                  setShowAddOwnerDialog(false);
+                }
+              }}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => {
+              setNewOwnerName('');
+              setPendingOwnerItem(null);
+              setShowAddOwnerDialog(false);
+            }}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={() => {
+                if (newOwnerName.trim()) {
+                  addOwner(newOwnerName.trim());
+                  if (pendingOwnerItem) {
+                    handleFieldChange(pendingOwnerItem, 'owner', newOwnerName.trim());
+                  }
+                  setNewOwnerName('');
+                  setPendingOwnerItem(null);
+                  setShowAddOwnerDialog(false);
+                }
+              }}
+              disabled={!newOwnerName.trim()}
+            >
+              Add Owner
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

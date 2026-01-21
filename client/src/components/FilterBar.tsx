@@ -1,6 +1,7 @@
 // Contract Negotiation Tracker - FilterBar Component
-// Design: Refined Legal Elegance - Search and filter controls
+// Design: Organic Modern Professional - Search and filter controls
 
+import { useState } from 'react';
 import { useNegotiation } from '@/contexts/NegotiationContext';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -10,8 +11,18 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  SelectSeparator,
 } from '@/components/ui/select';
-import { Search, X, Filter, Download, Upload } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Search, X, Filter, Download, Upload, Plus } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,7 +42,11 @@ export function FilterBar({ onImport }: FilterBarProps) {
     setFilterState, 
     formOptions,
     getCategoryNames,
+    addOwner,
   } = useNegotiation();
+
+  const [showAddOwnerDialog, setShowAddOwnerDialog] = useState(false);
+  const [newOwnerName, setNewOwnerName] = useState('');
 
   const hasFilters = 
     filterState.search !== '' ||
@@ -156,7 +171,13 @@ export function FilterBar({ onImport }: FilterBarProps) {
 
         <Select
           value={filterState.owner}
-          onValueChange={value => setFilterState(prev => ({ ...prev, owner: value }))}
+          onValueChange={value => {
+            if (value === '__add_new__') {
+              setShowAddOwnerDialog(true);
+            } else {
+              setFilterState(prev => ({ ...prev, owner: value }));
+            }
+          }}
         >
           <SelectTrigger className="w-[130px] h-9">
             <SelectValue placeholder="Owner" />
@@ -166,6 +187,13 @@ export function FilterBar({ onImport }: FilterBarProps) {
             {formOptions.owners.map(owner => (
               <SelectItem key={owner} value={owner}>{owner}</SelectItem>
             ))}
+            <SelectSeparator />
+            <SelectItem value="__add_new__" className="text-muted-foreground italic">
+              <span className="flex items-center gap-1.5">
+                <Plus className="w-3.5 h-3.5" />
+                Add new...
+              </span>
+            </SelectItem>
           </SelectContent>
         </Select>
 
@@ -207,6 +235,56 @@ export function FilterBar({ onImport }: FilterBarProps) {
           </Button>
         )}
       </div>
+
+      {/* Add New Owner Dialog */}
+      <Dialog open={showAddOwnerDialog} onOpenChange={setShowAddOwnerDialog}>
+        <DialogContent className="sm:max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle>Add New Owner</DialogTitle>
+            <DialogDescription>
+              Add a new owner option for clause assignments.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Label htmlFor="new-owner-name">Owner Name</Label>
+            <Input
+              id="new-owner-name"
+              value={newOwnerName}
+              onChange={(e) => setNewOwnerName(e.target.value)}
+              placeholder="e.g., Marketing, Engineering..."
+              className="mt-2"
+              autoFocus
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && newOwnerName.trim()) {
+                  addOwner(newOwnerName.trim());
+                  setNewOwnerName('');
+                  setShowAddOwnerDialog(false);
+                }
+              }}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => {
+              setNewOwnerName('');
+              setShowAddOwnerDialog(false);
+            }}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={() => {
+                if (newOwnerName.trim()) {
+                  addOwner(newOwnerName.trim());
+                  setNewOwnerName('');
+                  setShowAddOwnerDialog(false);
+                }
+              }}
+              disabled={!newOwnerName.trim()}
+            >
+              Add Owner
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

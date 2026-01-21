@@ -1,5 +1,5 @@
 // Contract Negotiation Tracker - ClauseForm Component
-// Design: Refined Legal Elegance - Form for adding/editing clause items
+// Design: Organic Modern Professional - Form for adding/editing clause items
 // Uses 3-Text Model: baselineText, theirPosition, ourPosition
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
@@ -12,6 +12,7 @@ import {
   Select,
   SelectContent,
   SelectItem,
+  SelectSeparator,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
@@ -25,6 +26,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { X, Save, Plus, Info } from 'lucide-react';
 import type { ClauseItem, ClauseStatus, Priority, RiskLevel, PaperSource } from '@/types';
@@ -83,10 +92,13 @@ export function ClauseForm({ editingItem, onClose, onSaved }: ClauseFormProps) {
     formOptions,
     impactCategories,
     getSubcategories,
+    addOwner,
   } = useNegotiation();
 
   const [formData, setFormData] = useState(defaultFormData);
   const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
+  const [showAddOwnerDialog, setShowAddOwnerDialog] = useState(false);
+  const [newOwnerName, setNewOwnerName] = useState('');
   const initialFormData = useRef(defaultFormData);
   
   // Get paper source for dynamic labels
@@ -336,7 +348,13 @@ export function ClauseForm({ editingItem, onClose, onSaved }: ClauseFormProps) {
               <Label>Owner</Label>
               <Select
                 value={formData.owner}
-                onValueChange={(value: string) => setFormData(prev => ({ ...prev, owner: value }))}
+                onValueChange={(value: string) => {
+                  if (value === '__add_new__') {
+                    setShowAddOwnerDialog(true);
+                  } else {
+                    setFormData(prev => ({ ...prev, owner: value }));
+                  }
+                }}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -345,6 +363,13 @@ export function ClauseForm({ editingItem, onClose, onSaved }: ClauseFormProps) {
                   {formOptions.owners.map(owner => (
                     <SelectItem key={owner} value={owner}>{owner}</SelectItem>
                   ))}
+                  <SelectSeparator />
+                  <SelectItem value="__add_new__" className="text-muted-foreground italic">
+                    <span className="flex items-center gap-1.5">
+                      <Plus className="w-3.5 h-3.5" />
+                      Add new...
+                    </span>
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -415,7 +440,7 @@ export function ClauseForm({ editingItem, onClose, onSaved }: ClauseFormProps) {
             </Button>
             <Button 
               type="submit"
-              className="bg-[oklch(0.25_0.05_250)] hover:bg-[oklch(0.30_0.05_250)]"
+              className="bg-primary hover:bg-primary/90"
             >
               {editingItem ? (
                 <>
@@ -450,6 +475,58 @@ export function ClauseForm({ editingItem, onClose, onSaved }: ClauseFormProps) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Add New Owner Dialog */}
+      <Dialog open={showAddOwnerDialog} onOpenChange={setShowAddOwnerDialog}>
+        <DialogContent className="sm:max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle>Add New Owner</DialogTitle>
+            <DialogDescription>
+              Add a new owner option for clause assignments.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Label htmlFor="form-new-owner-name">Owner Name</Label>
+            <Input
+              id="form-new-owner-name"
+              value={newOwnerName}
+              onChange={(e) => setNewOwnerName(e.target.value)}
+              placeholder="e.g., Marketing, Engineering..."
+              className="mt-2"
+              autoFocus
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && newOwnerName.trim()) {
+                  addOwner(newOwnerName.trim());
+                  setFormData(prev => ({ ...prev, owner: newOwnerName.trim() }));
+                  setNewOwnerName('');
+                  setShowAddOwnerDialog(false);
+                }
+              }}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => {
+              setNewOwnerName('');
+              setShowAddOwnerDialog(false);
+            }}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={() => {
+                if (newOwnerName.trim()) {
+                  addOwner(newOwnerName.trim());
+                  setFormData(prev => ({ ...prev, owner: newOwnerName.trim() }));
+                  setNewOwnerName('');
+                  setShowAddOwnerDialog(false);
+                }
+              }}
+              disabled={!newOwnerName.trim()}
+            >
+              Add Owner
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }

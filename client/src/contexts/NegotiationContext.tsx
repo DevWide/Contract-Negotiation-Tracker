@@ -1,10 +1,11 @@
 // Contract Negotiation Tracker - NegotiationContext
 // Global state management for the application
 
-import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
+import React, { createContext, useContext, useState, useCallback, useMemo, useEffect } from 'react';
 import type { 
   Contract, ClauseItem, FilterState, SortState, 
-  Template, PlaybookTopic, ImpactCategory, ColumnConfig 
+  Template, PlaybookTopic, ImpactCategory, ColumnConfig,
+  FormOptions
 } from '@/types';
 import { useContracts } from '@/hooks/useContracts';
 import { useTemplates } from '@/hooks/useTemplates';
@@ -14,6 +15,8 @@ import { useImpactConfig } from '@/hooks/useImpactConfig';
 import { useVersionHistory } from '@/hooks/useVersionHistory';
 import { useAnnotations } from '@/hooks/useAnnotations';
 import { defaultFormOptions } from '@/data/sampleData';
+
+const OWNERS_STORAGE_KEY = 'negotiation-tracker-owners';
 
 interface NegotiationContextType {
   // Contracts
@@ -105,7 +108,9 @@ interface NegotiationContextType {
   filteredItems: ClauseItem[];
   
   // Form Options
-  formOptions: typeof defaultFormOptions;
+  formOptions: FormOptions;
+  addOwner: (owner: string) => void;
+  removeOwner: (owner: string) => void;
   
   // Data Management
   clearAllData: () => void;
@@ -129,6 +134,38 @@ export function NegotiationProvider({ children }: { children: React.ReactNode })
   const impactConfigHook = useImpactConfig();
   const versionHistoryHook = useVersionHistory(contractsHook.updateClauseItem);
   const annotationsHook = useAnnotations(contractsHook.updateClauseItem);
+
+  // Dynamic owners state (persisted)
+  const [customOwners, setCustomOwners] = useState<string[]>(() => {
+    const stored = localStorage.getItem(OWNERS_STORAGE_KEY);
+    return stored ? JSON.parse(stored) : [];
+  });
+
+  // Persist custom owners to localStorage
+  useEffect(() => {
+    localStorage.setItem(OWNERS_STORAGE_KEY, JSON.stringify(customOwners));
+  }, [customOwners]);
+
+  // Computed form options with custom owners
+  const formOptions = useMemo<FormOptions>(() => ({
+    ...defaultFormOptions,
+    owners: [...defaultFormOptions.owners, ...customOwners],
+  }), [customOwners]);
+
+  // Add/remove owner functions
+  const addOwner = useCallback((owner: string) => {
+    const trimmed = owner.trim();
+    if (trimmed && !formOptions.owners.includes(trimmed)) {
+      setCustomOwners(prev => [...prev, trimmed]);
+    }
+  }, [formOptions.owners]);
+
+  const removeOwner = useCallback((owner: string) => {
+    // Only allow removing custom owners, not default ones
+    if (!defaultFormOptions.owners.includes(owner)) {
+      setCustomOwners(prev => prev.filter(o => o !== owner));
+    }
+  }, []);
 
   // UI State
   const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
@@ -310,7 +347,9 @@ export function NegotiationProvider({ children }: { children: React.ReactNode })
     filteredItems,
     
     // Form Options
-    formOptions: defaultFormOptions,
+    formOptions,
+    addOwner,
+    removeOwner,
     
     // Data Management
     clearAllData: contractsHook.clearAllData,
