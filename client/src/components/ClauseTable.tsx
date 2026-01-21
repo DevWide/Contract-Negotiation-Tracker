@@ -271,6 +271,16 @@ export function ClauseTable({
   const [newOwnerName, setNewOwnerName] = useState('');
   const [pendingOwnerItem, setPendingOwnerItem] = useState<ClauseItem | null>(null);
 
+  // Impact Category dialog state
+  const [showAddCategoryDialog, setShowAddCategoryDialog] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [pendingCategoryItem, setPendingCategoryItem] = useState<ClauseItem | null>(null);
+
+  // Subcategory dialog state
+  const [showAddSubcategoryDialog, setShowAddSubcategoryDialog] = useState(false);
+  const [newSubcategoryName, setNewSubcategoryName] = useState('');
+  const [pendingSubcategoryItem, setPendingSubcategoryItem] = useState<ClauseItem | null>(null);
+
   if (!activeContract) return null;
 
   const handleSort = (column: string) => {
@@ -458,12 +468,8 @@ export function ClauseTable({
               value={item.impactCategory}
               onValueChange={(value: string) => {
                 if (value === '__add_new__') {
-                  const newCat = prompt('Enter new category name:');
-                  if (newCat && newCat.trim()) {
-                    addImpactCategory(newCat.trim());
-                    handleFieldChange(item, 'impactCategory', newCat.trim());
-                    handleFieldChange(item, 'impactSubcategory', '');
-                  }
+                  setPendingCategoryItem(item);
+                  setShowAddCategoryDialog(true);
                 } else {
                   handleFieldChange(item, 'impactCategory', value);
                   // Reset subcategory when category changes
@@ -478,8 +484,12 @@ export function ClauseTable({
                 {impactCategories.map(cat => (
                   <SelectItem key={cat.name} value={cat.name}>{cat.name}</SelectItem>
                 ))}
-                <SelectItem value="__add_new__" className="text-primary font-medium">
-                  <span className="flex items-center gap-1"><Plus className="w-3 h-3" /> Add New</span>
+                <SelectSeparator />
+                <SelectItem value="__add_new__" className="text-muted-foreground italic">
+                  <span className="flex items-center gap-1.5">
+                    <Plus className="w-3.5 h-3.5" />
+                    Add new...
+                  </span>
                 </SelectItem>
               </SelectContent>
             </Select>
@@ -488,11 +498,8 @@ export function ClauseTable({
                 value={item.impactSubcategory}
                 onValueChange={(value: string) => {
                   if (value === '__add_new__') {
-                    const newSub = prompt('Enter new subcategory name:');
-                    if (newSub && newSub.trim()) {
-                      addSubcategory(item.impactCategory, newSub.trim());
-                      handleFieldChange(item, 'impactSubcategory', newSub.trim());
-                    }
+                    setPendingSubcategoryItem(item);
+                    setShowAddSubcategoryDialog(true);
                   } else {
                     handleFieldChange(item, 'impactSubcategory', value);
                   }
@@ -505,8 +512,12 @@ export function ClauseTable({
                   {getSubcategories(item.impactCategory).map(sub => (
                     <SelectItem key={sub} value={sub}>{sub}</SelectItem>
                   ))}
-                  <SelectItem value="__add_new__" className="text-primary font-medium">
-                    <span className="flex items-center gap-1"><Plus className="w-3 h-3" /> Add New</span>
+                  <SelectSeparator />
+                  <SelectItem value="__add_new__" className="text-muted-foreground italic">
+                    <span className="flex items-center gap-1.5">
+                      <Plus className="w-3.5 h-3.5" />
+                      Add new...
+                    </span>
                   </SelectItem>
                 </SelectContent>
               </Select>
@@ -773,6 +784,122 @@ export function ClauseTable({
               disabled={!newOwnerName.trim()}
             >
               Add Owner
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add New Impact Category Dialog */}
+      <Dialog open={showAddCategoryDialog} onOpenChange={setShowAddCategoryDialog}>
+        <DialogContent className="sm:max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle>Add New Impact Category</DialogTitle>
+            <DialogDescription>
+              Add a new impact category for clause classification.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Label htmlFor="clause-new-category-name">Category Name</Label>
+            <Input
+              id="clause-new-category-name"
+              value={newCategoryName}
+              onChange={(e) => setNewCategoryName(e.target.value)}
+              placeholder="e.g., Security, Technology..."
+              className="mt-2"
+              autoFocus
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && newCategoryName.trim()) {
+                  addImpactCategory(newCategoryName.trim());
+                  if (pendingCategoryItem) {
+                    handleFieldChange(pendingCategoryItem, 'impactCategory', newCategoryName.trim());
+                    handleFieldChange(pendingCategoryItem, 'impactSubcategory', '');
+                  }
+                  setNewCategoryName('');
+                  setPendingCategoryItem(null);
+                  setShowAddCategoryDialog(false);
+                }
+              }}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => {
+              setNewCategoryName('');
+              setPendingCategoryItem(null);
+              setShowAddCategoryDialog(false);
+            }}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={() => {
+                if (newCategoryName.trim()) {
+                  addImpactCategory(newCategoryName.trim());
+                  if (pendingCategoryItem) {
+                    handleFieldChange(pendingCategoryItem, 'impactCategory', newCategoryName.trim());
+                    handleFieldChange(pendingCategoryItem, 'impactSubcategory', '');
+                  }
+                  setNewCategoryName('');
+                  setPendingCategoryItem(null);
+                  setShowAddCategoryDialog(false);
+                }
+              }}
+              disabled={!newCategoryName.trim()}
+            >
+              Add Category
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add New Subcategory Dialog */}
+      <Dialog open={showAddSubcategoryDialog} onOpenChange={setShowAddSubcategoryDialog}>
+        <DialogContent className="sm:max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle>Add New Subcategory</DialogTitle>
+            <DialogDescription>
+              Add a new subcategory under "{pendingSubcategoryItem?.impactCategory}".
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Label htmlFor="clause-new-subcategory-name">Subcategory Name</Label>
+            <Input
+              id="clause-new-subcategory-name"
+              value={newSubcategoryName}
+              onChange={(e) => setNewSubcategoryName(e.target.value)}
+              placeholder="e.g., Data Protection, Audit Rights..."
+              className="mt-2"
+              autoFocus
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && newSubcategoryName.trim() && pendingSubcategoryItem) {
+                  addSubcategory(pendingSubcategoryItem.impactCategory, newSubcategoryName.trim());
+                  handleFieldChange(pendingSubcategoryItem, 'impactSubcategory', newSubcategoryName.trim());
+                  setNewSubcategoryName('');
+                  setPendingSubcategoryItem(null);
+                  setShowAddSubcategoryDialog(false);
+                }
+              }}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => {
+              setNewSubcategoryName('');
+              setPendingSubcategoryItem(null);
+              setShowAddSubcategoryDialog(false);
+            }}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={() => {
+                if (newSubcategoryName.trim() && pendingSubcategoryItem) {
+                  addSubcategory(pendingSubcategoryItem.impactCategory, newSubcategoryName.trim());
+                  handleFieldChange(pendingSubcategoryItem, 'impactSubcategory', newSubcategoryName.trim());
+                  setNewSubcategoryName('');
+                  setPendingSubcategoryItem(null);
+                  setShowAddSubcategoryDialog(false);
+                }
+              }}
+              disabled={!newSubcategoryName.trim()}
+            >
+              Add Subcategory
             </Button>
           </DialogFooter>
         </DialogContent>
