@@ -209,64 +209,41 @@ export function DashboardStats({ onStatusFilter, activeStatusFilter }: Dashboard
                   <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
                     {(() => {
                       const total = stats.total;
-                      const high = stats.byPriority.High / total;
-                      const medium = stats.byPriority.Medium / total;
-                      const low = stats.byPriority.Low / total;
+                      const circumference = 2 * Math.PI * 40; // 251.2 approx
                       
-                      let offset = 0;
-                      const segments = [];
+                      // Calculate percentages
+                      const highPct = stats.byPriority.High / total;
+                      const mediumPct = stats.byPriority.Medium / total;
+                      const lowPct = stats.byPriority.Low / total;
                       
-                      if (high > 0) {
-                        segments.push(
+                      // Build segments array with only non-zero values
+                      const prioritySegments = [
+                        { key: 'high', value: highPct, color: 'oklch(0.45 0.10 15)' },
+                        { key: 'medium', value: mediumPct, color: 'oklch(0.55 0.12 45)' },
+                        { key: 'low', value: lowPct, color: 'oklch(0.45 0.08 160)' },
+                      ].filter(s => s.value > 0);
+                      
+                      let cumulativeOffset = 0;
+                      
+                      return prioritySegments.map((segment) => {
+                        const dashLength = segment.value * circumference;
+                        const dashOffset = -cumulativeOffset * circumference;
+                        cumulativeOffset += segment.value;
+                        
+                        return (
                           <circle
-                            key="high"
+                            key={segment.key}
                             cx="50"
                             cy="50"
                             r="40"
                             fill="none"
-                            stroke="oklch(0.45 0.10 15)"
+                            stroke={segment.color}
                             strokeWidth="20"
-                            strokeDasharray={`${high * 251.2} 251.2`}
-                            strokeDashoffset={-offset * 251.2}
+                            strokeDasharray={`${dashLength} ${circumference}`}
+                            strokeDashoffset={dashOffset}
                           />
                         );
-                        offset += high;
-                      }
-                      
-                      if (medium > 0) {
-                        segments.push(
-                          <circle
-                            key="medium"
-                            cx="50"
-                            cy="50"
-                            r="40"
-                            fill="none"
-                            stroke="oklch(0.55 0.12 45)"
-                            strokeWidth="20"
-                            strokeDasharray={`${medium * 251.2} 251.2`}
-                            strokeDashoffset={-offset * 251.2}
-                          />
-                        );
-                        offset += medium;
-                      }
-                      
-                      if (low > 0) {
-                        segments.push(
-                          <circle
-                            key="low"
-                            cx="50"
-                            cy="50"
-                            r="40"
-                            fill="none"
-                            stroke="oklch(0.45 0.08 160)"
-                            strokeWidth="20"
-                            strokeDasharray={`${low * 251.2} 251.2`}
-                            strokeDashoffset={-offset * 251.2}
-                          />
-                        );
-                      }
-                      
-                      return segments;
+                      });
                     })()}
                   </svg>
                 ) : (
