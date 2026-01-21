@@ -338,7 +338,7 @@ export function ComparisonModal({ item, open, onClose }: ComparisonModalProps) {
                           key={index}
                           className={`${
                             word.type === 'added' 
-                            ? 'bg-[oklch(0.88_0.10_145)] text-[oklch(0.25_0.10_145)] px-0.5 rounded' 
+                            ? 'bg-[oklch(0.88_0.08_160)] text-[oklch(0.25_0.08_160)] px-0.5 rounded' 
                             : word.type === 'removed'
                             ? 'bg-[oklch(0.88_0.10_15)] text-[oklch(0.35_0.12_15)] line-through px-0.5 rounded'
                             : ''
@@ -396,7 +396,7 @@ export function ComparisonModal({ item, open, onClose }: ComparisonModalProps) {
                               key={index}
                               className={`${
                                 word.type === 'added' 
-                                  ? 'bg-[oklch(0.88_0.10_145)] text-[oklch(0.30_0.10_145)] px-0.5 rounded'
+                                  ? 'bg-[oklch(0.88_0.08_160)] text-[oklch(0.30_0.08_160)] px-0.5 rounded'
                                   : ''
                               }`}
                             >
@@ -669,7 +669,7 @@ export function ComparisonModal({ item, open, onClose }: ComparisonModalProps) {
                                   annotation.type === 'important' 
                                     ? 'border-[oklch(0.55_0.15_55)] text-[oklch(0.45_0.12_55)]'
                                     : annotation.type === 'question'
-                                    ? 'border-[oklch(0.50_0.10_240)] text-[oklch(0.40_0.08_240)]'
+                                    ? 'border-[oklch(0.50_0.06_280)] text-[oklch(0.40_0.04_280)]'
                                     : ''
                                 }`}
                             >
@@ -694,7 +694,7 @@ export function ComparisonModal({ item, open, onClose }: ComparisonModalProps) {
                                   size="icon"
                                   onClick={handleSaveEditAnnotation}
                                   disabled={!editingAnnotationText.trim()}
-                                  className="text-[oklch(0.45_0.12_145)] hover:text-[oklch(0.35_0.12_145)] shrink-0"
+                                  className="text-[oklch(0.45_0.08_160)] hover:text-[oklch(0.35_0.08_160)] shrink-0"
                                 >
                                   <Check className="w-4 h-4" />
                                 </Button>

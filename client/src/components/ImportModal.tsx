@@ -138,7 +138,7 @@ export function ImportModal({ open, onClose }: ImportModalProps) {
           {parsedItems.length > 0 && (
             <div className="flex-1 overflow-hidden">
               <h4 className="font-medium mb-2 flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-[oklch(0.45_0.12_145)]" />
+                <CheckCircle className="w-4 h-4 text-[oklch(0.45_0.08_160)]" />
                 Preview
               </h4>
               <ScrollArea className="h-[300px] border rounded-lg">

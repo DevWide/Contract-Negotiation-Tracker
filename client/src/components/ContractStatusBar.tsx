@@ -61,7 +61,7 @@ export function ContractStatusBar() {
                   className={`${
                     activeContract.paperSource === 'ours' 
                       ? 'border-[oklch(0.55_0.12_45)] text-[oklch(0.50_0.10_45)] bg-[oklch(0.93_0.05_45)]'
-                      : 'border-[oklch(0.50_0.10_240)] text-[oklch(0.40_0.08_240)] bg-[oklch(0.92_0.05_240)]'
+                      : 'border-[oklch(0.50_0.06_280)] text-[oklch(0.40_0.04_280)] bg-[oklch(0.92_0.04_280)]'
                   }`}
                 >
                   {paperSourceLabel}
@@ -71,7 +71,7 @@ export function ContractStatusBar() {
                   className={`${
                     activeContract.ballInCourt === 'us'
                       ? 'border-[oklch(0.55_0.15_55)] text-[oklch(0.45_0.12_55)] bg-[oklch(0.92_0.06_55)]'
-                      : 'border-[oklch(0.45_0.12_145)] text-[oklch(0.35_0.10_145)] bg-[oklch(0.92_0.06_145)]'
+                      : 'border-[oklch(0.45_0.08_160)] text-[oklch(0.35_0.08_160)] bg-[oklch(0.92_0.04_160)]'
                   }`}
                 >
                   {ballLabel}
@@ -112,7 +112,7 @@ export function ContractStatusBar() {
                   <FileText className={`w-5 h-5 mt-0.5 ${
                     activeContract.paperSource === 'ours' 
                       ? 'text-[oklch(0.55_0.12_45)]' 
-                      : 'text-[oklch(0.50_0.10_240)]'
+                      : 'text-[oklch(0.50_0.06_280)]'
                   }`} />
                   <div>
                     <p className="text-sm font-medium">{paperSourceLabel}</p>
@@ -134,7 +134,7 @@ export function ContractStatusBar() {
                   <Users className={`w-5 h-5 mt-0.5 ${
                     activeContract.ballInCourt === 'us' 
                       ? 'text-[oklch(0.55_0.15_55)]' 
-                      : 'text-[oklch(0.45_0.12_145)]'
+                      : 'text-[oklch(0.45_0.08_160)]'
                   }`} />
                   <div className="flex-1">
                     <p className="text-sm font-medium">{ballLabel}</p>

@@ -319,7 +319,7 @@ export function ClauseTable({
       case 'critical': return 'bg-[oklch(0.92_0.08_15)] text-[oklch(0.35_0.14_15)] border-[oklch(0.80_0.10_15)]';
       case 'high': return 'bg-[oklch(0.92_0.06_25)] text-[oklch(0.40_0.12_25)] border-[oklch(0.80_0.08_25)]';
       case 'medium': return 'bg-[oklch(0.92_0.06_55)] text-[oklch(0.45_0.12_55)] border-[oklch(0.80_0.08_55)]';
-      case 'low': return 'bg-[oklch(0.92_0.06_145)] text-[oklch(0.35_0.10_145)] border-[oklch(0.80_0.08_145)]';
+      case 'low': return 'bg-[oklch(0.92_0.04_160)] text-[oklch(0.35_0.08_160)] border-[oklch(0.80_0.06_160)]';
       default: return '';
     }
   };

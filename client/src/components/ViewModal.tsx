@@ -51,7 +51,7 @@ export function ViewModal({ item, open, onClose, onEdit, onCompare }: ViewModalP
       case 'critical': return 'bg-[oklch(0.92_0.08_15)] text-[oklch(0.35_0.14_15)]';
       case 'high': return 'bg-[oklch(0.92_0.06_25)] text-[oklch(0.40_0.12_25)]';
       case 'medium': return 'bg-[oklch(0.92_0.06_55)] text-[oklch(0.45_0.12_55)]';
-      case 'low': return 'bg-[oklch(0.92_0.06_145)] text-[oklch(0.35_0.10_145)]';
+      case 'low': return 'bg-[oklch(0.92_0.04_160)] text-[oklch(0.35_0.08_160)]';
       default: return '';
     }
   };
@@ -140,7 +140,7 @@ export function ViewModal({ item, open, onClose, onEdit, onCompare }: ViewModalP
                 <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-2">
                   Our Position
                 </h4>
-                <div className="p-4 bg-[oklch(0.92_0.06_145)]/30 border border-[oklch(0.80_0.08_145)] rounded-lg font-serif text-sm leading-relaxed">
+                <div className="p-4 bg-[oklch(0.92_0.04_160)]/30 border border-[oklch(0.80_0.06_160)] rounded-lg font-serif text-sm leading-relaxed">
                   {item.ourPosition}
                 </div>
               </div>

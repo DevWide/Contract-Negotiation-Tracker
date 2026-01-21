@@ -54,7 +54,7 @@ export function EmptyState({ onCreateContract }: EmptyStateProps) {
         {/* Hero */}
         <div className="mb-12">
           <div className="w-20 h-20 rounded-2xl bg-[oklch(0.55_0.12_45)] flex items-center justify-center mx-auto mb-6 shadow-lg">
-            <Scale className="w-10 h-10 text-[oklch(0.15_0.03_250)]" />
+            <Scale className="w-10 h-10 text-[oklch(0.98_0.01_80)]" />
           </div>
           <h1 className="font-serif text-4xl font-semibold text-[oklch(0.28_0.06_160)] mb-4">
             Contract Negotiation Tracker
@@ -101,7 +101,7 @@ export function EmptyState({ onCreateContract }: EmptyStateProps) {
             <Card key={index} className="border shadow-sm text-left">
               <CardContent className="p-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-[oklch(0.94_0.02_250)] flex items-center justify-center shrink-0">
+                  <div className="w-10 h-10 rounded-lg bg-[oklch(0.94_0.03_160)] flex items-center justify-center shrink-0">
                     <feature.icon className="w-5 h-5 text-[oklch(0.45_0.08_160)]" />
                   </div>
                   <div>

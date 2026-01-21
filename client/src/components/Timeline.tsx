@@ -41,13 +41,13 @@ import type { TimelineEvent } from '@/types';
 
 const eventTypes = [
   { value: 'Created', icon: FileText, color: 'bg-[oklch(0.45_0.08_160)]' },
-  { value: 'Sent', icon: Send, color: 'bg-[oklch(0.50_0.10_240)]' },
-  { value: 'Received', icon: MessageSquare, color: 'bg-[oklch(0.45_0.12_145)]' },
+  { value: 'Sent', icon: Send, color: 'bg-[oklch(0.50_0.06_280)]' },
+  { value: 'Received', icon: MessageSquare, color: 'bg-[oklch(0.45_0.08_160)]' },
   { value: 'Meeting', icon: Users, color: 'bg-[oklch(0.55_0.12_45)]' },
   { value: 'Review', icon: Clock, color: 'bg-[oklch(0.55_0.15_55)]' },
   { value: 'Escalated', icon: AlertTriangle, color: 'bg-[oklch(0.55_0.15_55)]' },
-  { value: 'Agreed', icon: CheckCircle, color: 'bg-[oklch(0.45_0.12_145)]' },
-  { value: 'Signed', icon: FileText, color: 'bg-[oklch(0.45_0.12_145)]' },
+  { value: 'Agreed', icon: CheckCircle, color: 'bg-[oklch(0.45_0.08_160)]' },
+  { value: 'Signed', icon: FileText, color: 'bg-[oklch(0.45_0.08_160)]' },
 ];
 
 export function Timeline() {

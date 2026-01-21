@@ -75,42 +75,42 @@ export function DashboardStats() {
       value: stats.total, 
       icon: FileText,
       color: 'text-[oklch(0.45_0.08_160)]',
-      bgColor: 'bg-[oklch(0.94_0.02_250)]',
+      bgColor: 'bg-[oklch(0.94_0.03_160)]',
     },
     { 
       label: 'Agreed', 
       value: stats.byStatus['Agreed'], 
       icon: CheckCircle2,
-      color: 'text-[oklch(0.35_0.10_145)]',
-      bgColor: 'bg-[oklch(0.92_0.06_145)]',
+      color: 'text-[oklch(0.35_0.08_160)]',
+      bgColor: 'bg-[oklch(0.92_0.04_160)]',
     },
     { 
       label: 'In Discussion', 
       value: stats.byStatus['In Discussion'], 
       icon: MessageSquare,
-      color: 'text-[oklch(0.40_0.08_240)]',
-      bgColor: 'bg-[oklch(0.92_0.05_240)]',
+      color: 'text-[oklch(0.40_0.06_280)]',
+      bgColor: 'bg-[oklch(0.92_0.04_280)]',
     },
     { 
       label: 'Escalated', 
       value: stats.byStatus['Escalated'], 
       icon: AlertTriangle,
-      color: 'text-[oklch(0.45_0.12_55)]',
-      bgColor: 'bg-[oklch(0.92_0.06_55)]',
+      color: 'text-[oklch(0.50_0.10_55)]',
+      bgColor: 'bg-[oklch(0.92_0.05_55)]',
     },
     { 
       label: 'Blocked', 
       value: stats.byStatus['Blocked'], 
       icon: AlertOctagon,
-      color: 'text-[oklch(0.40_0.12_15)]',
-      bgColor: 'bg-[oklch(0.92_0.06_15)]',
+      color: 'text-[oklch(0.45_0.10_15)]',
+      bgColor: 'bg-[oklch(0.92_0.05_15)]',
     },
     { 
       label: 'No Changes', 
       value: stats.byStatus['No Changes'], 
       icon: Minus,
-      color: 'text-[oklch(0.45_0.02_250)]',
-      bgColor: 'bg-[oklch(0.94_0.01_250)]',
+      color: 'text-[oklch(0.50_0.02_80)]',
+      bgColor: 'bg-[oklch(0.94_0.01_80)]',
     },
   ];
 
@@ -142,7 +142,7 @@ export function DashboardStats() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between mb-3">
               <h4 className="text-sm font-medium">Completion Progress</h4>
-              <span className="text-2xl font-serif font-semibold text-[oklch(0.45_0.12_145)]">
+              <span className="text-2xl font-serif font-semibold text-[oklch(0.45_0.08_160)]">
                 {stats.completionRate}%
               </span>
             </div>
@@ -161,21 +161,21 @@ export function DashboardStats() {
               <div className="flex-1 space-y-2">
                 <div className="flex items-center justify-between text-sm">
                   <span className="flex items-center gap-2">
-                    <span className="w-3 h-3 rounded-full bg-[oklch(0.40_0.12_15)]" />
+                    <span className="w-3 h-3 rounded-full bg-[oklch(0.45_0.10_15)]" />
                     High
                   </span>
                   <span className="font-medium">{stats.byPriority.High}</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="flex items-center gap-2">
-                    <span className="w-3 h-3 rounded-full bg-[oklch(0.55_0.15_55)]" />
+                    <span className="w-3 h-3 rounded-full bg-[oklch(0.55_0.12_45)]" />
                     Medium
                   </span>
                   <span className="font-medium">{stats.byPriority.Medium}</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="flex items-center gap-2">
-                    <span className="w-3 h-3 rounded-full bg-[oklch(0.45_0.12_145)]" />
+                    <span className="w-3 h-3 rounded-full bg-[oklch(0.45_0.08_160)]" />
                     Low
                   </span>
                   <span className="font-medium">{stats.byPriority.Low}</span>
@@ -201,7 +201,7 @@ export function DashboardStats() {
                             cy="50"
                             r="40"
                             fill="none"
-                            stroke="oklch(0.40 0.12 15)"
+                            stroke="oklch(0.45 0.10 15)"
                             strokeWidth="20"
                             strokeDasharray={`${high * 251.2} 251.2`}
                             strokeDashoffset={-offset * 251.2}
@@ -218,7 +218,7 @@ export function DashboardStats() {
                             cy="50"
                             r="40"
                             fill="none"
-                            stroke="oklch(0.55 0.15 55)"
+                            stroke="oklch(0.55 0.12 45)"
                             strokeWidth="20"
                             strokeDasharray={`${medium * 251.2} 251.2`}
                             strokeDashoffset={-offset * 251.2}
@@ -235,7 +235,7 @@ export function DashboardStats() {
                             cy="50"
                             r="40"
                             fill="none"
-                            stroke="oklch(0.45 0.12 145)"
+                            stroke="oklch(0.45 0.08 160)"
                             strokeWidth="20"
                             strokeDasharray={`${low * 251.2} 251.2`}
                             strokeDashoffset={-offset * 251.2}
