@@ -660,8 +660,8 @@ export function TemplatesPage({ onClose }: TemplatesPageProps) {
                     <div className="border-t bg-muted/30 p-4">
                       {/* Expanded Clauses Table with All Columns */}
                       {template.clauses.length > 0 ? (
-                        <div className="border rounded-lg bg-background overflow-hidden mb-4 max-h-[500px] overflow-y-auto">
-                          <div className="min-w-[1400px] overflow-x-auto">
+                        <div className="border rounded-lg bg-background overflow-x-auto mb-4 max-h-[500px] overflow-y-auto">
+                          <div className="min-w-[1400px]">
                               <table className="w-full">
                                 <thead>
                                   <tr className="border-b bg-muted/50">

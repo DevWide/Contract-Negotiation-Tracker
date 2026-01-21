@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 import { useNegotiation } from '@/contexts/NegotiationContext';
+import { useOnboarding } from '@/contexts/OnboardingContext';
 import { Button } from '@/components/ui/button';
 import { NewContractFromTemplateDialog } from '@/components/NewContractFromTemplateDialog';
 import {
@@ -39,7 +40,6 @@ import {
   Copy, 
   Archive,
   Trash2,
-  Scale,
   Library,
   MoreVertical
 } from 'lucide-react';
@@ -70,6 +70,8 @@ export function Header({ onOpenSettings, onOpenTemplates }: HeaderProps) {
     deleteContract,
     templates,
   } = useNegotiation();
+  
+  const { markFeatureDiscovered } = useOnboarding();
 
   const [showNewContractDialog, setShowNewContractDialog] = useState(false);
   const [showFromTemplateDialog, setShowFromTemplateDialog] = useState(false);
@@ -100,10 +102,14 @@ export function Header({ onOpenSettings, onOpenTemplates }: HeaderProps) {
           description: newContractForm.description.trim(),
           template: selectedTemplate,
         });
+        markFeatureDiscovered('use-template');
       }
     } else {
       createContract(newContractForm);
     }
+    
+    // Track feature discovery
+    markFeatureDiscovered('create-contract');
     
     setNewContractForm({ name: '', counterparty: '', description: '', paperSource: 'ours', templateId: undefined });
     setShowNewContractDialog(false);
@@ -146,19 +152,22 @@ export function Header({ onOpenSettings, onOpenTemplates }: HeaderProps) {
         <div className="container flex items-center justify-between h-16">
           {/* Logo & Title */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-[#FAF9F5] flex items-center justify-center">
-              <Scale className="w-6 h-6 text-[oklch(0.28_0.06_160)]" />
+            <div className="w-10 h-10 rounded-lg bg-[#FAF9F5] flex items-center justify-center overflow-hidden">
+              <img 
+                src="/images/logo cnt.png" 
+                alt="Contract Negotiation Tracker Logo" 
+                className="w-8 h-8 object-contain"
+              />
             </div>
             <div>
               <h1 className="text-lg font-serif font-semibold tracking-tight">
                 Contract Negotiation Tracker
               </h1>
-              <p className="text-xs text-white/60">Legal & Procurement</p>
             </div>
           </div>
 
           {/* Contract Switcher */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3" data-tour="contract-switcher">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button 
@@ -318,6 +327,7 @@ export function Header({ onOpenSettings, onOpenTemplates }: HeaderProps) {
               onClick={onOpenSettings}
               className="text-white/70 hover:text-white hover:bg-white/10"
               title="Settings"
+              data-tour="settings"
             >
               <Settings className="w-5 h-5" />
             </Button>

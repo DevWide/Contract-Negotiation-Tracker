@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 import { useNegotiation } from '@/contexts/NegotiationContext';
+import { useOnboarding } from '@/contexts/OnboardingContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -52,6 +53,7 @@ const eventTypes = [
 
 export function Timeline() {
   const { activeContract, addTimelineEvent, updateTimelineEvent, deleteTimelineEvent } = useNegotiation();
+  const { markFeatureDiscovered } = useOnboarding();
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showViewDialog, setShowViewDialog] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<TimelineEvent | null>(null);
@@ -81,6 +83,8 @@ export function Timeline() {
       date: newEvent.date,
       notes: newEvent.notes.trim() || undefined,
     });
+    // Track feature discovery
+    markFeatureDiscovered('add-timeline-note');
     setNewEvent({
       type: 'Meeting',
       description: '',
@@ -153,7 +157,7 @@ export function Timeline() {
             <Calendar className="w-5 h-5 text-[oklch(0.55_0.12_45)]" />
             Negotiation Timeline
           </CardTitle>
-          <Button size="sm" onClick={() => setShowAddDialog(true)}>
+          <Button size="sm" onClick={() => setShowAddDialog(true)} data-tour="add-timeline">
             <Plus className="w-4 h-4 mr-1" />
             Add Event
           </Button>

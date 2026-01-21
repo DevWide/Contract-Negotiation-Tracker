@@ -344,4 +344,28 @@
   .organic-gap {
     @apply gap-5 sm:gap-6;
   }
+  
+  /* Onboarding tour highlight effect */
+  .tour-highlight {
+    position: relative;
+    z-index: 60;
+    box-shadow: 
+      0 0 0 4px oklch(0.55 0.12 45 / 0.3),
+      0 0 24px 8px oklch(0.55 0.12 45 / 0.15);
+    border-radius: var(--radius);
+    animation: tour-pulse 2s ease-in-out infinite;
+  }
+  
+  @keyframes tour-pulse {
+    0%, 100% {
+      box-shadow: 
+        0 0 0 4px oklch(0.55 0.12 45 / 0.3),
+        0 0 24px 8px oklch(0.55 0.12 45 / 0.15);
+    }
+    50% {
+      box-shadow: 
+        0 0 0 6px oklch(0.55 0.12 45 / 0.4),
+        0 0 32px 12px oklch(0.55 0.12 45 / 0.2);
+    }
+  }
 }

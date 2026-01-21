@@ -8,6 +8,10 @@ import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { NegotiationProvider } from "./contexts/NegotiationContext";
+import { OnboardingProvider } from "./contexts/OnboardingContext";
+import { WelcomeModal } from "./components/onboarding/WelcomeModal";
+import { TourTooltip } from "./components/onboarding/TourTooltip";
+import { HelpWidget } from "./components/onboarding/HelpWidget";
 import Home from "./pages/Home";
 
 function Router() {
@@ -26,10 +30,16 @@ function App() {
     <ErrorBoundary>
       <ThemeProvider defaultTheme="light">
         <NegotiationProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Router />
-          </TooltipProvider>
+          <OnboardingProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Router />
+              {/* Onboarding Components */}
+              <WelcomeModal />
+              <TourTooltip />
+              <HelpWidget />
+            </TooltipProvider>
+          </OnboardingProvider>
         </NegotiationProvider>
       </ThemeProvider>
     </ErrorBoundary>

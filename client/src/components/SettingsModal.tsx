@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 import { useNegotiation } from '@/contexts/NegotiationContext';
+import { useOnboarding } from '@/contexts/OnboardingContext';
 import { useEscapeKey } from '@/hooks/useKeyboardShortcuts';
 import {
   Dialog,
@@ -45,12 +46,17 @@ import {
   ChevronDown,
   X,
   Pencil,
-  Upload
+  Upload,
+  BookOpen,
+  AlertTriangle,
+  ChevronUp,
+  HelpCircle
 } from 'lucide-react';
 import { exportAllDataToJSON, downloadFile } from '@/lib/exportUtils';
 import { EditTemplateDialog } from '@/components/EditTemplateDialog';
 import { ImportTemplateDialog } from '@/components/ImportTemplateDialog';
-import type { Template } from '@/types';
+import { PlaybookTopicDialog } from '@/components/PlaybookTopicDialog';
+import type { Template, PlaybookTopic } from '@/types';
 
 interface SettingsModalProps {
   open: boolean;
@@ -79,7 +85,15 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
     addSubcategory,
     removeSubcategory,
     resetImpactCategories,
+    // Playbook
+    playbookTopics,
+    playbookCategories,
+    createPlaybookTopic,
+    updatePlaybookTopic,
+    deletePlaybookTopic,
   } = useNegotiation();
+
+  const { hideHelpWidget, setHideHelpWidget } = useOnboarding();
 
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [newColumnName, setNewColumnName] = useState('');
@@ -90,6 +104,11 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
   const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
   const [editingTemplate, setEditingTemplate] = useState<Template | null>(null);
   const [showImportDialog, setShowImportDialog] = useState(false);
+  
+  // Playbook editing state
+  const [editingPlaybookTopic, setEditingPlaybookTopic] = useState<PlaybookTopic | null>(null);
+  const [showNewTopicDialog, setShowNewTopicDialog] = useState(false);
+  const [expandedPlaybookCategories, setExpandedPlaybookCategories] = useState<string[]>([]);
 
   useEscapeKey(onClose, open);
 
@@ -157,6 +176,10 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
               <TabsTrigger value="categories" className="flex items-center gap-1">
                 <Tags className="w-3.5 h-3.5" />
                 Categories
+              </TabsTrigger>
+              <TabsTrigger value="playbook" className="flex items-center gap-1">
+                <BookOpen className="w-3.5 h-3.5" />
+                Playbook
               </TabsTrigger>
               <TabsTrigger value="templates" className="flex items-center gap-1">
                 <FileText className="w-3.5 h-3.5" />
@@ -336,6 +359,99 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
               </ScrollArea>
             </TabsContent>
 
+            {/* Playbook Tab */}
+            <TabsContent value="playbook" className="flex-1 min-h-0 mt-4">
+              <ScrollArea className="h-[400px]">
+                <div className="space-y-4 pr-4">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm text-muted-foreground">
+                      Manage negotiation guidance topics with positions, fallbacks, and red lines.
+                    </p>
+                    <Button size="sm" onClick={() => setShowNewTopicDialog(true)}>
+                      <Plus className="w-4 h-4 mr-1" />
+                      Add Topic
+                    </Button>
+                  </div>
+
+                  {playbookCategories.length === 0 ? (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <BookOpen className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                      <p>No playbook topics yet</p>
+                      <p className="text-sm">Add negotiation guidance to help with clause negotiations</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {playbookCategories.map(category => {
+                        const categoryTopics = playbookTopics.filter(t => t.category === category);
+                        const isExpanded = expandedPlaybookCategories.includes(category);
+                        
+                        return (
+                          <Collapsible
+                            key={category}
+                            open={isExpanded}
+                            onOpenChange={(open) => {
+                              setExpandedPlaybookCategories(prev =>
+                                open
+                                  ? [...prev, category]
+                                  : prev.filter(c => c !== category)
+                              );
+                            }}
+                          >
+                            <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
+                              <div className="flex items-center gap-2">
+                                {isExpanded ? (
+                                  <ChevronUp className="w-4 h-4 text-muted-foreground" />
+                                ) : (
+                                  <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                                )}
+                                <span className="font-medium">{category}</span>
+                                <span className="text-xs text-muted-foreground bg-background px-2 py-0.5 rounded-full">
+                                  {categoryTopics.length} {categoryTopics.length === 1 ? 'topic' : 'topics'}
+                                </span>
+                              </div>
+                            </CollapsibleTrigger>
+                            <CollapsibleContent className="pt-2 pl-6 space-y-2">
+                              {categoryTopics.map(topic => (
+                                <div
+                                  key={topic.id}
+                                  className="flex items-center justify-between p-3 bg-background border rounded-lg"
+                                >
+                                  <div className="flex-1 min-w-0">
+                                    <div className="font-medium truncate">{topic.title}</div>
+                                    <div className="text-xs text-muted-foreground truncate">
+                                      {topic.positions.length} positions • {topic.commonObjections.length} objections
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center gap-1">
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-8 w-8"
+                                      onClick={() => setEditingPlaybookTopic(topic)}
+                                    >
+                                      <Pencil className="w-4 h-4" />
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-8 w-8 text-destructive hover:text-destructive"
+                                      onClick={() => deletePlaybookTopic(topic.id)}
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                    </Button>
+                                  </div>
+                                </div>
+                              ))}
+                            </CollapsibleContent>
+                          </Collapsible>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </ScrollArea>
+            </TabsContent>
+
             {/* Templates Tab */}
             <TabsContent value="templates" className="flex-1 min-h-0 mt-4">
               <ScrollArea className="h-[400px]">
@@ -422,6 +538,27 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
               <ScrollArea className="h-[400px]">
                 <div className="space-y-6 pr-4">
                   <div>
+                    <h4 className="font-medium mb-2 flex items-center gap-2">
+                      <HelpCircle className="w-4 h-4" />
+                      Preferences
+                    </h4>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                        <div>
+                          <p className="text-sm font-medium">Feature Discovery Widget</p>
+                          <p className="text-xs text-muted-foreground">
+                            Show the floating help button with feature tips
+                          </p>
+                        </div>
+                        <Switch
+                          checked={!hideHelpWidget}
+                          onCheckedChange={(checked) => setHideHelpWidget(!checked)}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t">
                     <h4 className="font-medium mb-2">Export Data</h4>
                     <p className="text-sm text-muted-foreground mb-3">
                       Download all your contracts and data as a JSON backup file.
@@ -522,6 +659,26 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
             description: templateData.description,
             clauses: templateData.clauses,
           });
+        }}
+      />
+
+      {/* Playbook Topic Dialog */}
+      <PlaybookTopicDialog
+        open={showNewTopicDialog || !!editingPlaybookTopic}
+        onOpenChange={(open) => {
+          if (!open) {
+            setShowNewTopicDialog(false);
+            setEditingPlaybookTopic(null);
+          }
+        }}
+        topic={editingPlaybookTopic}
+        existingCategories={playbookCategories}
+        onSave={(topicData) => {
+          if ('id' in topicData) {
+            updatePlaybookTopic(topicData.id, topicData);
+          } else {
+            createPlaybookTopic(topicData);
+          }
         }}
       />
     </>

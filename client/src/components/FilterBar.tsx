@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 import { useNegotiation } from '@/contexts/NegotiationContext';
+import { useOnboarding } from '@/contexts/OnboardingContext';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
@@ -44,6 +45,8 @@ export function FilterBar({ onImport }: FilterBarProps) {
     getCategoryNames,
     addOwner,
   } = useNegotiation();
+  
+  const { markFeatureDiscovered } = useOnboarding();
 
   const [showAddOwnerDialog, setShowAddOwnerDialog] = useState(false);
   const [newOwnerName, setNewOwnerName] = useState('');
@@ -72,6 +75,7 @@ export function FilterBar({ onImport }: FilterBarProps) {
     const csv = exportToCSV(activeContract);
     const filename = generateFilename(activeContract.name, 'csv');
     downloadFile(csv, filename, 'text/csv');
+    markFeatureDiscovered('export-data');
   };
 
   const handleExportJSON = () => {
@@ -79,6 +83,7 @@ export function FilterBar({ onImport }: FilterBarProps) {
     const json = exportToJSON(activeContract);
     const filename = generateFilename(activeContract.name, 'json');
     downloadFile(json, filename, 'application/json');
+    markFeatureDiscovered('export-data');
   };
 
   const categoryNames = getCategoryNames();

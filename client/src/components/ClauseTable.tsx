@@ -3,6 +3,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useNegotiation } from '@/contexts/NegotiationContext';
+import { useOnboarding } from '@/contexts/OnboardingContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -163,9 +164,10 @@ function InlineTextEditor({
     <div
       onClick={() => setIsEditing(true)}
       className={`group cursor-pointer rounded px-1 py-0.5 -mx-1 hover:bg-muted/70 transition-colors ${className}`}
+      title={value || undefined}
     >
       <div className="flex items-center gap-1">
-        <span className={value ? '' : 'text-muted-foreground italic'}>
+        <span className={`line-clamp-2 ${value ? '' : 'text-muted-foreground italic'}`}>
           {value || placeholder || '—'}
         </span>
         <Pencil className="w-3 h-3 opacity-0 group-hover:opacity-50 transition-opacity flex-shrink-0" />
@@ -208,7 +210,10 @@ function PopoverTextEditor({
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
-        <div className="group cursor-pointer rounded px-1 py-0.5 -mx-1 hover:bg-muted/70 transition-colors">
+        <div 
+          className="group cursor-pointer rounded px-1 py-0.5 -mx-1 hover:bg-muted/70 transition-colors"
+          title={value || undefined}
+        >
           <div className="flex items-center gap-1">
             {displayValue || (
               <span className={value ? 'line-clamp-2' : 'text-muted-foreground italic'}>
@@ -266,6 +271,8 @@ export function ClauseTable({
     getSubcategories,
     addOwner,
   } = useNegotiation();
+  
+  const { markFeatureDiscovered } = useOnboarding();
 
   const [showAddOwnerDialog, setShowAddOwnerDialog] = useState(false);
   const [newOwnerName, setNewOwnerName] = useState('');
@@ -357,7 +364,7 @@ export function ClauseTable({
       
       case 'issue':
         return (
-          <div className="max-w-[200px]">
+          <div className="min-w-0">
             <InlineTextEditor
               value={item.issue}
               onSave={(value) => handleFieldChange(item, 'issue', value)}
@@ -371,7 +378,7 @@ export function ClauseTable({
               placeholder="Enter negotiation rationale..."
               displayValue={
                 item.rationale ? (
-                  <p className="text-xs text-muted-foreground truncate mt-0.5 max-w-[180px]">
+                  <p className="text-xs text-muted-foreground truncate mt-0.5">
                     {item.rationale}
                   </p>
                 ) : (
@@ -556,7 +563,7 @@ export function ClauseTable({
             label="Edit Baseline Text"
             placeholder="Enter baseline clause text..."
             displayValue={
-              <p className="text-sm text-muted-foreground line-clamp-2 max-w-[250px]">
+              <p className="text-sm text-muted-foreground line-clamp-2">
                 {item.baselineText || <span className="italic">No text</span>}
               </p>
             }
@@ -571,7 +578,7 @@ export function ClauseTable({
             label="Edit Their Position"
             placeholder="Enter counterparty's proposed text..."
             displayValue={
-              <p className="text-sm text-muted-foreground line-clamp-2 max-w-[250px]">
+              <p className="text-sm text-muted-foreground line-clamp-2">
                 {item.theirPosition || <span className="italic">—</span>}
               </p>
             }
@@ -586,7 +593,7 @@ export function ClauseTable({
             label="Edit Our Position"
             placeholder="Enter our proposed text..."
             displayValue={
-              <p className="text-sm text-muted-foreground line-clamp-2 max-w-[250px]">
+              <p className="text-sm text-muted-foreground line-clamp-2">
                 {item.ourPosition || <span className="italic">—</span>}
               </p>
             }
@@ -608,7 +615,7 @@ export function ClauseTable({
             label="Edit Rationale"
             placeholder="Enter negotiation rationale..."
             displayValue={
-              <p className="text-sm text-muted-foreground line-clamp-2 max-w-[200px]">
+              <p className="text-sm text-muted-foreground line-clamp-2">
                 {item.rationale || <span className="italic">—</span>}
               </p>
             }
@@ -663,7 +670,7 @@ export function ClauseTable({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredItems.map(item => (
+            {filteredItems.map((item, index) => (
               <TableRow 
                 key={item.id}
                 className={`transition-colors ${
@@ -678,14 +685,23 @@ export function ClauseTable({
                 }}
               >
                 {visibleColumns.map(column => (
-                  <TableCell key={column.id} className="py-3 align-top">
+                  <TableCell 
+                    key={column.id} 
+                    className="py-3 align-top"
+                    style={{ width: column.width, maxWidth: column.width }}
+                  >
                     {renderCell(item, column.id)}
                   </TableCell>
                 ))}
                 <TableCell className="align-top">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8"
+                        {...(index === 0 ? { 'data-tour': 'clause-actions' } : {})}
+                      >
                         <MoreHorizontal className="w-4 h-4" />
                       </Button>
                     </DropdownMenuTrigger>
@@ -694,7 +710,10 @@ export function ClauseTable({
                         <Eye className="w-4 h-4 mr-2" />
                         View Details
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => onCompareItem(item)}>
+                      <DropdownMenuItem onClick={() => {
+                        onCompareItem(item);
+                        markFeatureDiscovered('compare-texts');
+                      }}>
                         <GitCompare className="w-4 h-4 mr-2" />
                         Compare Text
                       </DropdownMenuItem>
@@ -703,7 +722,10 @@ export function ClauseTable({
                         Edit All Fields
                       </DropdownMenuItem>
                       {onViewPlaybook && (
-                        <DropdownMenuItem onClick={() => onViewPlaybook(item)}>
+                        <DropdownMenuItem onClick={() => {
+                          onViewPlaybook(item);
+                          markFeatureDiscovered('view-playbook');
+                        }}>
                           <BookOpen className="w-4 h-4 mr-2" />
                           View Playbook
                         </DropdownMenuItem>

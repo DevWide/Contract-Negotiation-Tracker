@@ -3,6 +3,7 @@
 
 import { useMemo } from 'react';
 import { useNegotiation } from '@/contexts/NegotiationContext';
+import { useOnboarding } from '@/contexts/OnboardingContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { 
@@ -21,6 +22,7 @@ interface DashboardStatsProps {
 
 export function DashboardStats({ onStatusFilter, activeStatusFilter }: DashboardStatsProps) {
   const { activeContract } = useNegotiation();
+  const { markFeatureDiscovered } = useOnboarding();
 
   const stats = useMemo(() => {
     if (!activeContract) {
@@ -126,7 +128,7 @@ export function DashboardStats({ onStatusFilter, activeStatusFilter }: Dashboard
   ];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" data-tour="dashboard-stats">
       {/* Status Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         {statusCards.map(({ label, value, icon: Icon, color, bgColor, filterValue }) => {
@@ -134,13 +136,23 @@ export function DashboardStats({ onStatusFilter, activeStatusFilter }: Dashboard
             (activeStatusFilter === null && filterValue === null);
           const isClickable = onStatusFilter !== undefined;
           
+          const handleClick = () => {
+            if (isClickable) {
+              onStatusFilter(filterValue);
+              // Track feature discovery when filtering
+              if (filterValue !== null) {
+                markFeatureDiscovered('filter-by-status');
+              }
+            }
+          };
+          
           return (
             <Card 
               key={label} 
               className={`border shadow-sm transition-all ${
                 isClickable ? 'cursor-pointer hover:shadow-md hover:border-primary/50' : ''
               } ${isActive && activeStatusFilter !== undefined ? 'ring-2 ring-primary ring-offset-2' : ''}`}
-              onClick={() => isClickable && onStatusFilter(filterValue)}
+              onClick={handleClick}
             >
               <CardContent className="p-4">
                 <div className="flex items-center gap-3">

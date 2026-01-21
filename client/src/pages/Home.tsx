@@ -3,6 +3,7 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useNegotiation } from '@/contexts/NegotiationContext';
+import { useOnboarding } from '@/contexts/OnboardingContext';
 import { Header } from '@/components/Header';
 import { ContractStatusBar } from '@/components/ContractStatusBar';
 import { DashboardStats } from '@/components/DashboardStats';
@@ -46,6 +47,8 @@ export default function Home() {
     setFilterState,
     filterState,
   } = useNegotiation();
+  
+  const { markFeatureDiscovered } = useOnboarding();
 
   // Modal states
   const [showSettings, setShowSettings] = useState(false);
@@ -324,7 +327,7 @@ export default function Home() {
         </section>
 
         {/* Clause Management */}
-        <section ref={clauseSectionRef} className="space-y-4">
+        <section ref={clauseSectionRef} className="space-y-4" data-tour="clause-table">
           <div className="flex items-center justify-between">
             <h2 className="font-serif text-xl font-semibold">
               Clause Items
@@ -337,6 +340,7 @@ export default function Home() {
             <Button 
               onClick={() => setShowAddForm(true)}
               className="bg-[oklch(0.45_0.08_160)] hover:bg-[oklch(0.50_0.08_160)]"
+              data-tour="add-clause"
             >
               <Plus className="w-4 h-4 mr-2" />
               Add Clause
@@ -357,6 +361,9 @@ export default function Home() {
                 onSaved={() => {
                   if (editingItem) {
                     setEditingItem(null);
+                  } else {
+                    // Track add-clause feature when a new clause is saved
+                    markFeatureDiscovered('add-clause');
                   }
                 }}
               />
