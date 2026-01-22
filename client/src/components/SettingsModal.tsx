@@ -4,6 +4,7 @@
 import { useState } from 'react';
 import { useNegotiation } from '@/contexts/NegotiationContext';
 import { useOnboarding } from '@/contexts/OnboardingContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { useEscapeKey } from '@/hooks/useKeyboardShortcuts';
 import {
   Dialog,
@@ -50,7 +51,11 @@ import {
   BookOpen,
   AlertTriangle,
   ChevronUp,
-  HelpCircle
+  HelpCircle,
+  Palette,
+  Sun,
+  Moon,
+  Play
 } from 'lucide-react';
 import { exportAllDataToJSON, downloadFile } from '@/lib/exportUtils';
 import { EditTemplateDialog } from '@/components/EditTemplateDialog';
@@ -93,7 +98,8 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
     deletePlaybookTopic,
   } = useNegotiation();
 
-  const { hideHelpWidget, setHideHelpWidget } = useOnboarding();
+  const { hideHelpWidget, setHideHelpWidget, startTour } = useOnboarding();
+  const { theme, toggleTheme } = useTheme();
 
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [newColumnName, setNewColumnName] = useState('');
@@ -162,34 +168,116 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
   return (
     <>
       <Dialog open={open} onOpenChange={onClose}>
-        <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col">
+        <DialogContent className="sm:max-w-2xl max-h-[85vh] flex flex-col">
           <DialogHeader>
             <DialogTitle className="font-serif text-xl">Settings</DialogTitle>
           </DialogHeader>
 
-          <Tabs defaultValue="columns" className="flex-1 flex flex-col min-h-0">
-            <TabsList className="flex-shrink-0">
-              <TabsTrigger value="columns" className="flex items-center gap-1">
+          <Tabs defaultValue="appearance" className="flex-1 flex flex-col min-h-0">
+            <TabsList className="flex-shrink-0 w-full flex">
+              <TabsTrigger value="appearance" className="flex-1 flex items-center justify-center gap-1">
+                <Palette className="w-3.5 h-3.5" />
+                Appearance
+              </TabsTrigger>
+              <TabsTrigger value="columns" className="flex-1 flex items-center justify-center gap-1">
                 <Columns className="w-3.5 h-3.5" />
                 Columns
               </TabsTrigger>
-              <TabsTrigger value="categories" className="flex items-center gap-1">
+              <TabsTrigger value="categories" className="flex-1 flex items-center justify-center gap-1">
                 <Tags className="w-3.5 h-3.5" />
                 Categories
               </TabsTrigger>
-              <TabsTrigger value="playbook" className="flex items-center gap-1">
+              <TabsTrigger value="playbook" className="flex-1 flex items-center justify-center gap-1">
                 <BookOpen className="w-3.5 h-3.5" />
                 Playbook
               </TabsTrigger>
-              <TabsTrigger value="templates" className="flex items-center gap-1">
+              <TabsTrigger value="templates" className="flex-1 flex items-center justify-center gap-1">
                 <FileText className="w-3.5 h-3.5" />
                 Templates
               </TabsTrigger>
-              <TabsTrigger value="data" className="flex items-center gap-1">
+              <TabsTrigger value="data" className="flex-1 flex items-center justify-center gap-1">
                 <Database className="w-3.5 h-3.5" />
                 Data
               </TabsTrigger>
             </TabsList>
+
+            {/* Appearance Tab */}
+            <TabsContent value="appearance" className="flex-1 min-h-0 mt-4">
+              <ScrollArea className="h-[400px]">
+                <div className="space-y-6 pr-4">
+                  <div>
+                    <h4 className="font-medium mb-2">Theme</h4>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Choose between light and dark mode for the interface.
+                    </p>
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => theme === 'dark' && toggleTheme?.()}
+                        className={`flex-1 p-4 rounded-lg border-2 transition-all ${
+                          theme === 'light'
+                            ? 'border-primary bg-primary/5'
+                            : 'border-border hover:border-muted-foreground/50'
+                        }`}
+                      >
+                        <div className="flex flex-col items-center gap-2">
+                          <Sun className="w-8 h-8" />
+                          <span className="font-medium">Light</span>
+                        </div>
+                      </button>
+                      <button
+                        onClick={() => theme === 'light' && toggleTheme?.()}
+                        className={`flex-1 p-4 rounded-lg border-2 transition-all ${
+                          theme === 'dark'
+                            ? 'border-primary bg-primary/5'
+                            : 'border-border hover:border-muted-foreground/50'
+                        }`}
+                      >
+                        <div className="flex flex-col items-center gap-2">
+                          <Moon className="w-8 h-8" />
+                          <span className="font-medium">Dark</span>
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t">
+                    <h4 className="font-medium mb-2">Help Widget</h4>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      Show or hide the floating help button in the bottom-right corner.
+                    </p>
+                    <div className="flex items-center justify-between p-3 border rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <HelpCircle className="w-5 h-5 text-muted-foreground" />
+                        <span className="font-medium">Show Help Widget</span>
+                      </div>
+                      <Switch
+                        checked={!hideHelpWidget}
+                        onCheckedChange={(checked) => setHideHelpWidget(!checked)}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t">
+                    <h4 className="font-medium mb-2">Guided Tour</h4>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      Take a quick tour of the main features and navigation.
+                    </p>
+                    <Button 
+                      variant="outline" 
+                      className="w-full"
+                      onClick={() => {
+                        onClose();
+                        // Small delay to allow modal to close before tour starts
+                        setTimeout(() => startTour(), 300);
+                      }}
+                    >
+                      <Play className="w-4 h-4 mr-2" />
+                      Restart Guided Tour
+                    </Button>
+                  </div>
+                </div>
+              </ScrollArea>
+            </TabsContent>
 
             {/* Columns Tab */}
             <TabsContent value="columns" className="flex-1 min-h-0 mt-4">

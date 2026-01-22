@@ -93,11 +93,17 @@ export function ClauseForm({ editingItem, onClose, onSaved }: ClauseFormProps) {
     impactCategories,
     getSubcategories,
     addOwner,
+    addImpactCategory,
+    addSubcategory,
   } = useNegotiation();
 
   const [formData, setFormData] = useState(defaultFormData);
   const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
   const [showAddOwnerDialog, setShowAddOwnerDialog] = useState(false);
+  const [showAddCategoryDialog, setShowAddCategoryDialog] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [showAddSubcategoryDialog, setShowAddSubcategoryDialog] = useState(false);
+  const [newSubcategoryName, setNewSubcategoryName] = useState('');
   const [newOwnerName, setNewOwnerName] = useState('');
   const initialFormData = useRef(defaultFormData);
   
@@ -398,11 +404,17 @@ export function ClauseForm({ editingItem, onClose, onSaved }: ClauseFormProps) {
               <Label>Impact Category</Label>
               <Select
                 value={formData.impactCategory}
-                onValueChange={(value: string) => setFormData(prev => ({ 
-                  ...prev, 
-                  impactCategory: value,
-                  impactSubcategory: '' 
-                }))}
+                onValueChange={(value: string) => {
+                  if (value === '__add_new__') {
+                    setShowAddCategoryDialog(true);
+                  } else {
+                    setFormData(prev => ({ 
+                      ...prev, 
+                      impactCategory: value,
+                      impactSubcategory: '' 
+                    }));
+                  }
+                }}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select category" />
@@ -411,6 +423,13 @@ export function ClauseForm({ editingItem, onClose, onSaved }: ClauseFormProps) {
                   {impactCategories.map(cat => (
                     <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
                   ))}
+                  <SelectSeparator />
+                  <SelectItem value="__add_new__" className="text-muted-foreground italic">
+                    <span className="flex items-center gap-1.5">
+                      <Plus className="w-3.5 h-3.5" />
+                      Add new...
+                    </span>
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -418,7 +437,13 @@ export function ClauseForm({ editingItem, onClose, onSaved }: ClauseFormProps) {
               <Label>Subcategory</Label>
               <Select
                 value={formData.impactSubcategory}
-                onValueChange={(value: string) => setFormData(prev => ({ ...prev, impactSubcategory: value }))}
+                onValueChange={(value: string) => {
+                  if (value === '__add_new__') {
+                    setShowAddSubcategoryDialog(true);
+                  } else {
+                    setFormData(prev => ({ ...prev, impactSubcategory: value }));
+                  }
+                }}
                 disabled={!formData.impactCategory}
               >
                 <SelectTrigger>
@@ -428,6 +453,13 @@ export function ClauseForm({ editingItem, onClose, onSaved }: ClauseFormProps) {
                   {subcategories.map(sub => (
                     <SelectItem key={sub} value={sub}>{sub}</SelectItem>
                   ))}
+                  <SelectSeparator />
+                  <SelectItem value="__add_new__" className="text-muted-foreground italic">
+                    <span className="flex items-center gap-1.5">
+                      <Plus className="w-3.5 h-3.5" />
+                      Add new...
+                    </span>
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -523,6 +555,110 @@ export function ClauseForm({ editingItem, onClose, onSaved }: ClauseFormProps) {
               disabled={!newOwnerName.trim()}
             >
               Add Owner
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add New Category Dialog */}
+      <Dialog open={showAddCategoryDialog} onOpenChange={setShowAddCategoryDialog}>
+        <DialogContent className="sm:max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle>Add New Category</DialogTitle>
+            <DialogDescription>
+              Add a new impact category for clause classification.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Label htmlFor="form-new-category-name">Category Name</Label>
+            <Input
+              id="form-new-category-name"
+              value={newCategoryName}
+              onChange={(e) => setNewCategoryName(e.target.value)}
+              placeholder="e.g., Technical, Governance..."
+              className="mt-2"
+              autoFocus
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && newCategoryName.trim()) {
+                  addImpactCategory(newCategoryName.trim());
+                  setFormData(prev => ({ ...prev, impactCategory: newCategoryName.trim(), impactSubcategory: '' }));
+                  setNewCategoryName('');
+                  setShowAddCategoryDialog(false);
+                }
+              }}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => {
+              setNewCategoryName('');
+              setShowAddCategoryDialog(false);
+            }}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={() => {
+                if (newCategoryName.trim()) {
+                  addImpactCategory(newCategoryName.trim());
+                  setFormData(prev => ({ ...prev, impactCategory: newCategoryName.trim(), impactSubcategory: '' }));
+                  setNewCategoryName('');
+                  setShowAddCategoryDialog(false);
+                }
+              }}
+              disabled={!newCategoryName.trim()}
+            >
+              Add Category
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add New Subcategory Dialog */}
+      <Dialog open={showAddSubcategoryDialog} onOpenChange={setShowAddSubcategoryDialog}>
+        <DialogContent className="sm:max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle>Add New Subcategory</DialogTitle>
+            <DialogDescription>
+              Add a new subcategory under "{formData.impactCategory}".
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Label htmlFor="form-new-subcategory-name">Subcategory Name</Label>
+            <Input
+              id="form-new-subcategory-name"
+              value={newSubcategoryName}
+              onChange={(e) => setNewSubcategoryName(e.target.value)}
+              placeholder="e.g., Data Protection, Audit..."
+              className="mt-2"
+              autoFocus
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && newSubcategoryName.trim() && formData.impactCategory) {
+                  addSubcategory(formData.impactCategory, newSubcategoryName.trim());
+                  setFormData(prev => ({ ...prev, impactSubcategory: newSubcategoryName.trim() }));
+                  setNewSubcategoryName('');
+                  setShowAddSubcategoryDialog(false);
+                }
+              }}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => {
+              setNewSubcategoryName('');
+              setShowAddSubcategoryDialog(false);
+            }}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={() => {
+                if (newSubcategoryName.trim() && formData.impactCategory) {
+                  addSubcategory(formData.impactCategory, newSubcategoryName.trim());
+                  setFormData(prev => ({ ...prev, impactSubcategory: newSubcategoryName.trim() }));
+                  setNewSubcategoryName('');
+                  setShowAddSubcategoryDialog(false);
+                }
+              }}
+              disabled={!newSubcategoryName.trim()}
+            >
+              Add Subcategory
             </Button>
           </DialogFooter>
         </DialogContent>

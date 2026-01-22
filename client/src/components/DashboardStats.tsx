@@ -151,7 +151,7 @@ export function DashboardStats({ onStatusFilter, activeStatusFilter }: Dashboard
               key={label} 
               className={`border shadow-sm transition-all ${
                 isClickable ? 'cursor-pointer hover:shadow-md hover:border-primary/50' : ''
-              } ${isActive && activeStatusFilter !== undefined ? 'ring-2 ring-primary ring-offset-2' : ''}`}
+              } ${isActive && activeStatusFilter !== undefined ? 'border-primary' : ''}`}
               onClick={handleClick}
             >
               <CardContent className="p-4">

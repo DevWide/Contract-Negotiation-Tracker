@@ -397,7 +397,7 @@ export function ClauseTable({
             value={item.status}
             onValueChange={(value: ClauseStatus) => handleFieldChange(item, 'status', value)}
           >
-            <SelectTrigger className="h-8 w-[130px] border-0 bg-transparent p-0">
+            <SelectTrigger className="h-8 w-[130px] border-0 bg-transparent p-0" hideChevron>
               <Badge variant="outline" className={`${getStatusBadgeClass(item.status)} cursor-pointer`}>
                 {item.status}
               </Badge>
@@ -420,7 +420,7 @@ export function ClauseTable({
             value={item.priority}
             onValueChange={(value: Priority) => handleFieldChange(item, 'priority', value)}
           >
-            <SelectTrigger className="h-8 w-[100px] border-0 bg-transparent p-0">
+            <SelectTrigger className="h-8 w-[100px] border-0 bg-transparent p-0" hideChevron>
               <Badge variant="outline" className={`${getPriorityBadgeClass(item.priority)} cursor-pointer`}>
                 {item.priority}
               </Badge>
@@ -538,7 +538,7 @@ export function ClauseTable({
             value={item.riskLevel}
             onValueChange={(value: RiskLevel) => handleFieldChange(item, 'riskLevel', value)}
           >
-            <SelectTrigger className="h-8 w-[100px] border-0 bg-transparent p-0">
+            <SelectTrigger className="h-8 w-[100px] border-0 bg-transparent p-0" hideChevron>
               <Badge variant="outline" className={`${getRiskBadgeClass(item.riskLevel)} cursor-pointer`}>
                 {item.riskLevel.charAt(0).toUpperCase() + item.riskLevel.slice(1)}
               </Badge>

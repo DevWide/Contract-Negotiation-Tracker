@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <!-- Background circle -->
+  <circle cx="16" cy="16" r="15" fill="#1e40af"/>
+  
+  <!-- Handshake icon - two hands meeting -->
+  <g stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <!-- Left hand coming from bottom-left -->
+    <path d="M7 18.5L9 17L12 18.5L16 16"/>
+    <!-- Right hand coming from bottom-right -->
+    <path d="M25 18.5L23 17L20 18.5L16 16"/>
+    <!-- Clasp/grip in center -->
+    <path d="M13 14.5C13 14.5 14.5 13 16 13C17.5 13 19 14.5 19 14.5"/>
+    <!-- Left arm -->
+    <path d="M7 18.5L5 21.5"/>
+    <!-- Right arm -->
+    <path d="M25 18.5L27 21.5"/>
+    <!-- Document behind hands -->
+    <rect x="11" y="8" width="10" height="12" rx="1" stroke-width="1.2" opacity="0.6"/>
+    <!-- Document lines -->
+    <line x1="13" y1="11" x2="19" y2="11" stroke-width="1" opacity="0.5"/>
+    <line x1="13" y1="13.5" x2="17" y2="13.5" stroke-width="1" opacity="0.5"/>
+  </g>
+</svg>
