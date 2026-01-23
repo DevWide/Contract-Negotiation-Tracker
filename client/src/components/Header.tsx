@@ -68,7 +68,7 @@ export function Header({ onOpenSettings, onOpenTemplates }: HeaderProps) {
     createContractFromTemplate,
     duplicateContract,
     archiveContract,
-    cna completeContract,
+    completeContract,
     deleteContract,
     templates,
   } = useNegotiation();
