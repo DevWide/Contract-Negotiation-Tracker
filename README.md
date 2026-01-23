@@ -94,8 +94,8 @@ A sophisticated contract negotiation tracking application designed for legal pro
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/negotiation-tracker.git
-   cd negotiation-tracker
+   git clone https://github.com/Gianni-pv/Contract-Negotiation-Tracker.git
+   cd Contract-Negotiation-Tracker
    ```
 
 2. **Install dependencies**
@@ -110,7 +110,7 @@ A sophisticated contract negotiation tracking application designed for legal pro
 
 4. **Open the app**
    
-   Navigate to `http://localhost:5173` in your browser
+   Navigate to `http://localhost:3000` in your browser
 
 ### Building for Production
 
