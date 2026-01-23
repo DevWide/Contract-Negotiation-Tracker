@@ -39,3 +39,9 @@ pnpm-debug.log*
 
 # Demo documents
 Docs/AI_Addendum_demo*.docx
+Docs/demo_msa_demo_template.docx
+
+# Internal brainstorming docs
+Docs/*-brainstorm.md
+Docs/debug_parser.py
+Docs/AI-Agent-Instructions*.md
