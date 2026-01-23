@@ -397,7 +397,7 @@ export function ClauseTable({
             value={item.status}
             onValueChange={(value: ClauseStatus) => handleFieldChange(item, 'status', value)}
           >
-            <SelectTrigger className="h-8 w-[130px] border-0 bg-transparent p-0" hideChevron>
+            <SelectTrigger className="h-8 w-[130px] border-0 bg-transparent p-0 shadow-none" hideChevron>
               <Badge variant="outline" className={`${getStatusBadgeClass(item.status)} cursor-pointer`}>
                 {item.status}
               </Badge>
@@ -420,7 +420,7 @@ export function ClauseTable({
             value={item.priority}
             onValueChange={(value: Priority) => handleFieldChange(item, 'priority', value)}
           >
-            <SelectTrigger className="h-8 w-[100px] border-0 bg-transparent p-0" hideChevron>
+            <SelectTrigger className="h-8 w-[100px] border-0 bg-transparent p-0 shadow-none" hideChevron>
               <Badge variant="outline" className={`${getPriorityBadgeClass(item.priority)} cursor-pointer`}>
                 {item.priority}
               </Badge>
@@ -450,7 +450,7 @@ export function ClauseTable({
               }
             }}
           >
-            <SelectTrigger className="h-8 w-[110px] text-sm">
+            <SelectTrigger className="h-7 w-[120px] text-xs border-0 bg-transparent px-0 shadow-none" hideChevron>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -484,7 +484,7 @@ export function ClauseTable({
                 }
               }}
             >
-              <SelectTrigger className="h-7 w-[120px] text-xs">
+              <SelectTrigger className="h-7 w-[120px] text-xs border-0 bg-transparent px-0 shadow-none" hideChevron>
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
               <SelectContent>
@@ -512,7 +512,7 @@ export function ClauseTable({
                   }
                 }}
               >
-                <SelectTrigger className="h-6 w-[120px] text-xs text-muted-foreground">
+                <SelectTrigger className="h-6 w-[120px] text-xs text-muted-foreground border-0 bg-transparent px-0 shadow-none" hideChevron>
                   <SelectValue placeholder="Subcategory" />
                 </SelectTrigger>
                 <SelectContent>
@@ -538,7 +538,7 @@ export function ClauseTable({
             value={item.riskLevel}
             onValueChange={(value: RiskLevel) => handleFieldChange(item, 'riskLevel', value)}
           >
-            <SelectTrigger className="h-8 w-[100px] border-0 bg-transparent p-0" hideChevron>
+            <SelectTrigger className="h-8 w-[100px] border-0 bg-transparent p-0 shadow-none" hideChevron>
               <Badge variant="outline" className={`${getRiskBadgeClass(item.riskLevel)} cursor-pointer`}>
                 {item.riskLevel.charAt(0).toUpperCase() + item.riskLevel.slice(1)}
               </Badge>
@@ -602,9 +602,11 @@ export function ClauseTable({
       
       case 'currentRound':
         return (
-          <Badge variant="outline" className="font-mono text-xs">
-            Round {item.currentRound || 0}
-          </Badge>
+          <div className="h-8 flex items-center pt-0.5 pr-4">
+            <Badge variant="outline" className="text-xs">
+              Round {item.currentRound || 0}
+            </Badge>
+          </div>
         );
       
       case 'rationale':

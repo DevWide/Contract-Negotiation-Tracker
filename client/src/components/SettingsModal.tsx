@@ -115,6 +115,7 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
   const [editingPlaybookTopic, setEditingPlaybookTopic] = useState<PlaybookTopic | null>(null);
   const [showNewTopicDialog, setShowNewTopicDialog] = useState(false);
   const [expandedPlaybookCategories, setExpandedPlaybookCategories] = useState<string[]>([]);
+  const [expandedPlaybookTopics, setExpandedPlaybookTopics] = useState<string[]>([]);
 
   useEscapeKey(onClose, open);
 
@@ -499,37 +500,128 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
                               </div>
                             </CollapsibleTrigger>
                             <CollapsibleContent className="pt-2 pl-6 space-y-2">
-                              {categoryTopics.map(topic => (
-                                <div
-                                  key={topic.id}
-                                  className="flex items-center justify-between p-3 bg-background border rounded-lg"
-                                >
-                                  <div className="flex-1 min-w-0">
-                                    <div className="font-medium truncate">{topic.title}</div>
-                                    <div className="text-xs text-muted-foreground truncate">
-                                      {topic.positions.length} positions • {topic.commonObjections.length} objections
+                              {categoryTopics.map(topic => {
+                                const isTopicExpanded = expandedPlaybookTopics.includes(topic.id);
+                                return (
+                                  <Collapsible
+                                    key={topic.id}
+                                    open={isTopicExpanded}
+                                    onOpenChange={(open) => {
+                                      setExpandedPlaybookTopics(prev =>
+                                        open
+                                          ? [...prev, topic.id]
+                                          : prev.filter(id => id !== topic.id)
+                                      );
+                                    }}
+                                  >
+                                    <div className="bg-background border rounded-lg overflow-hidden">
+                                      <CollapsibleTrigger className="w-full flex items-center justify-between p-3 hover:bg-muted/50 transition-colors text-left">
+                                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                                          {isTopicExpanded ? (
+                                            <ChevronUp className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                                          ) : (
+                                            <ChevronDown className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                                          )}
+                                          <div className="flex-1 min-w-0">
+                                            <div className="font-medium truncate">{topic.title}</div>
+                                            <div className="text-xs text-muted-foreground truncate">
+                                              {topic.positions.length} positions • {topic.commonObjections.length} objections
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <div className="flex items-center gap-1 flex-shrink-0">
+                                          <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-8 w-8"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              setEditingPlaybookTopic(topic);
+                                            }}
+                                          >
+                                            <Pencil className="w-4 h-4" />
+                                          </Button>
+                                          <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-8 w-8 text-destructive hover:text-destructive"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              deletePlaybookTopic(topic.id);
+                                            }}
+                                          >
+                                            <Trash2 className="w-4 h-4" />
+                                          </Button>
+                                        </div>
+                                      </CollapsibleTrigger>
+                                      <CollapsibleContent className="border-t bg-muted/30 p-3 space-y-3">
+                                        {/* Positions */}
+                                        {topic.positions.map((pos, posIdx) => (
+                                          <div key={pos.id} className="space-y-2">
+                                            {/* Position */}
+                                            <div>
+                                              <div className="text-xs font-medium text-muted-foreground mb-1">
+                                                {posIdx === 0 ? 'Our Position' : `Position ${posIdx + 1}`}
+                                              </div>
+                                              <div className="text-sm bg-background p-2 rounded border">
+                                                {pos.position}
+                                              </div>
+                                              {pos.proposedChange && (
+                                                <div className="text-xs text-muted-foreground mt-1 italic">
+                                                  {pos.proposedChange}
+                                                </div>
+                                              )}
+                                            </div>
+                                            {/* Fallback */}
+                                            {pos.fallback && (
+                                              <div>
+                                                <div className="text-xs font-medium text-muted-foreground mb-1">Fallback</div>
+                                                <div className="text-sm bg-amber-50 dark:bg-amber-900/20 p-2 rounded border border-amber-200 dark:border-amber-800">
+                                                  {pos.fallback}
+                                                </div>
+                                              </div>
+                                            )}
+                                            {/* Red Line */}
+                                            {pos.redline && (
+                                              <div>
+                                                <div className="text-xs font-medium text-red-600 mb-1">Red Line</div>
+                                                <div className="text-sm bg-red-50 dark:bg-red-900/20 p-2 rounded border border-red-200 dark:border-red-800">
+                                                  {pos.redline}
+                                                </div>
+                                              </div>
+                                            )}
+                                            {posIdx < topic.positions.length - 1 && (
+                                              <hr className="my-2 border-border" />
+                                            )}
+                                          </div>
+                                        ))}
+                                        {topic.positions.length === 0 && (
+                                          <div className="text-sm text-muted-foreground italic">No positions defined</div>
+                                        )}
+                                        {/* Common Objections */}
+                                        {topic.commonObjections.length > 0 && (
+                                          <div>
+                                            <div className="text-xs font-medium text-muted-foreground mb-1">Common Objections</div>
+                                            <ul className="text-sm space-y-1">
+                                              {topic.commonObjections.slice(0, 3).map((objection, idx) => (
+                                                <li key={idx} className="flex gap-2">
+                                                  <span className="text-muted-foreground">•</span>
+                                                  <span className="line-clamp-1">{objection}</span>
+                                                </li>
+                                              ))}
+                                              {topic.commonObjections.length > 3 && (
+                                                <li className="text-xs text-muted-foreground">
+                                                  + {topic.commonObjections.length - 3} more objections
+                                                </li>
+                                              )}
+                                            </ul>
+                                          </div>
+                                        )}
+                                      </CollapsibleContent>
                                     </div>
-                                  </div>
-                                  <div className="flex items-center gap-1">
-                                    <Button
-                                      variant="ghost"
-                                      size="icon"
-                                      className="h-8 w-8"
-                                      onClick={() => setEditingPlaybookTopic(topic)}
-                                    >
-                                      <Pencil className="w-4 h-4" />
-                                    </Button>
-                                    <Button
-                                      variant="ghost"
-                                      size="icon"
-                                      className="h-8 w-8 text-destructive hover:text-destructive"
-                                      onClick={() => deletePlaybookTopic(topic.id)}
-                                    >
-                                      <Trash2 className="w-4 h-4" />
-                                    </Button>
-                                  </div>
-                                </div>
-                              ))}
+                                  </Collapsible>
+                                );
+                              })}
                             </CollapsibleContent>
                           </Collapsible>
                         );

@@ -198,6 +198,10 @@ export function useContracts() {
     updateContract(id, { status: 'archived' });
   }, [updateContract]);
 
+  const completeContract = useCallback((id: number) => {
+    updateContract(id, { status: 'completed' });
+  }, [updateContract]);
+
   const toggleBallInCourt = useCallback((id: number) => {
     const contract = contracts.find(c => c.id === id);
     if (!contract) return;
@@ -348,6 +352,7 @@ export function useContracts() {
     deleteContract,
     duplicateContract,
     archiveContract,
+    completeContract,
     toggleBallInCourt,
     addClauseItem,
     updateClauseItem,

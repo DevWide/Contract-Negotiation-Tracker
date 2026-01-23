@@ -30,6 +30,7 @@ interface NegotiationContextType {
   deleteContract: ReturnType<typeof useContracts>['deleteContract'];
   duplicateContract: ReturnType<typeof useContracts>['duplicateContract'];
   archiveContract: ReturnType<typeof useContracts>['archiveContract'];
+  completeContract: ReturnType<typeof useContracts>['completeContract'];
   toggleBallInCourt: ReturnType<typeof useContracts>['toggleBallInCourt'];
   
   // Clause Items
@@ -269,6 +270,7 @@ export function NegotiationProvider({ children }: { children: React.ReactNode })
     deleteContract: contractsHook.deleteContract,
     duplicateContract: contractsHook.duplicateContract,
     archiveContract: contractsHook.archiveContract,
+    completeContract: contractsHook.completeContract,
     toggleBallInCourt: contractsHook.toggleBallInCourt,
     
     // Clause Items

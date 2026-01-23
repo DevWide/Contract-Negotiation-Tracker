@@ -41,7 +41,8 @@ import {
   Archive,
   Trash2,
   Library,
-  MoreVertical
+  MoreVertical,
+  CheckCircle
 } from 'lucide-react';
 import type { PaperSource } from '@/types';
 
@@ -67,6 +68,7 @@ export function Header({ onOpenSettings, onOpenTemplates }: HeaderProps) {
     createContractFromTemplate,
     duplicateContract,
     archiveContract,
+    cna completeContract,
     deleteContract,
     templates,
   } = useNegotiation();
@@ -127,6 +129,12 @@ export function Header({ onOpenSettings, onOpenTemplates }: HeaderProps) {
   const handleArchive = () => {
     if (activeContract) {
       archiveContract(activeContract.id);
+    }
+  };
+
+  const handleComplete = () => {
+    if (activeContract) {
+      completeContract(activeContract.id);
     }
   };
 
@@ -291,6 +299,12 @@ export function Header({ onOpenSettings, onOpenTemplates }: HeaderProps) {
                     <Copy className="w-4 h-4 mr-2" />
                     Duplicate Contract
                   </DropdownMenuItem>
+                  {activeContract && activeContract.status === 'active' && (
+                    <DropdownMenuItem onClick={handleComplete}>
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      Mark as Completed
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem onClick={handleArchive}>
                     <Archive className="w-4 h-4 mr-2" />
                     Archive Contract

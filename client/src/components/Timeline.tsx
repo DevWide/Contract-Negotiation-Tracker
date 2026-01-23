@@ -52,10 +52,11 @@ const eventTypes = [
 ];
 
 export function Timeline() {
-  const { activeContract, addTimelineEvent, updateTimelineEvent, deleteTimelineEvent } = useNegotiation();
+  const { activeContract, addTimelineEvent, updateTimelineEvent, deleteTimelineEvent, completeContract, archiveContract } = useNegotiation();
   const { markFeatureDiscovered } = useOnboarding();
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showViewDialog, setShowViewDialog] = useState(false);
+  const [showCompletionDialog, setShowCompletionDialog] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<TimelineEvent | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [newEvent, setNewEvent] = useState({
@@ -77,6 +78,9 @@ export function Timeline() {
 
   const handleAddEvent = () => {
     if (!newEvent.description.trim()) return;
+    
+    const isSigned = newEvent.type === 'Signed';
+    
     addTimelineEvent(activeContract.id, {
       type: newEvent.type,
       description: newEvent.description.trim(),
@@ -92,6 +96,21 @@ export function Timeline() {
       notes: '',
     });
     setShowAddDialog(false);
+    
+    // Show completion dialog if event type is "Signed"
+    if (isSigned && activeContract.status === 'active') {
+      setShowCompletionDialog(true);
+    }
+  };
+
+  const handleMarkAsCompleted = () => {
+    completeContract(activeContract.id);
+    setShowCompletionDialog(false);
+  };
+
+  const handleArchiveContract = () => {
+    archiveContract(activeContract.id);
+    setShowCompletionDialog(false);
   };
 
   const handleEventClick = (event: TimelineEvent) => {
@@ -435,6 +454,50 @@ export function Timeline() {
               )}
             </div>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Contract Completion Dialog */}
+      <Dialog open={showCompletionDialog} onOpenChange={setShowCompletionDialog}>
+        <DialogContent className="sm:max-w-[450px]">
+          <DialogHeader>
+            <DialogTitle className="font-serif flex items-center gap-2">
+              <CheckCircle className="w-5 h-5 text-[oklch(0.45_0.08_160)]" />
+              Contract Signed!
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-muted-foreground mb-4">
+              Congratulations! The contract has been signed. Would you like to update its status?
+            </p>
+            <div className="space-y-3">
+              <Button 
+                onClick={handleMarkAsCompleted}
+                className="w-full justify-start bg-[oklch(0.45_0.08_160)] hover:bg-[oklch(0.50_0.08_160)]"
+              >
+                <CheckCircle className="w-4 h-4 mr-2" />
+                Mark as Completed
+                <span className="text-xs text-white/70 ml-auto">Keep visible in dashboard</span>
+              </Button>
+              <Button 
+                onClick={handleArchiveContract}
+                variant="outline"
+                className="w-full justify-start"
+              >
+                <FileText className="w-4 h-4 mr-2" />
+                Archive Contract
+                <span className="text-xs text-muted-foreground ml-auto">Move to archives</span>
+              </Button>
+              <Button 
+                onClick={() => setShowCompletionDialog(false)}
+                variant="ghost"
+                className="w-full justify-start"
+              >
+                Keep Active
+                <span className="text-xs text-muted-foreground ml-auto">Continue working</span>
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </Card>
