@@ -79,7 +79,7 @@ A sophisticated contract negotiation tracking application designed for legal pro
 - **CSV Import**: Import clauses from CSV files
 - **CSV Export**: Export contract data to CSV for spreadsheets
 - **JSON Export**: Full contract export to JSON format
-- **Document Import**: Parse clauses from DOCX, PDF, and TXT files
+- **Document Import**: Parse clauses from DOCX
 
 ---
 
@@ -188,17 +188,6 @@ pnpm start
 2. **Add events**: Click the "+" button to log meetings, document exchanges, etc.
 3. **Add notes**: Include detailed context for each event
 4. **Review history**: Click events to view or edit details
-
----
-
-## ⌨️ Keyboard Shortcuts
-
-| Shortcut | Action |
-|----------|--------|
-| `Ctrl+N` / `Cmd+N` | Add new clause |
-| `Escape` | Close modals/dialogs |
-| `Enter` (in table) | Save inline edit |
-| `Escape` (in table) | Cancel inline edit |
 
 ---
 
