@@ -5,13 +5,19 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-7.x-646CFF?logo=vite)](https://vitejs.dev/)
 
-A sophisticated contract negotiation tracking application designed for legal professionals, procurement teams, and business negotiators. Manage clauses, track multi-round negotiations, compare text changes, and leverage negotiation playbooks—all in a refined, intuitive interface.
+A contract negotiation tracking application designed for legal professionals, procurement teams, and business negotiators. 
+Manage clauses, track multi-round negotiations, compare text changes, and leverage negotiation playbooks—all in a refined, intuitive interface.
 
 <p align="center">
   <img src="client/public/images/screenshot.png" alt="Negotiation Tracker Screenshot" width="800" />
 </p>
 
+**Disclaimer**
+This project is an early prototype built for demonstration and experimentation purposes only. It is not production-ready and comes with no security or compliance guarantees.
+Please use dummy or synthetic data only. Do not upload or process confidential, client, or regulated information. Use at your own discretion.
+
 ---
+Planning and problem framing mural whiteboard: https://app.mural.co/t/murally-org/m/murally-org/1768987490185/d60b486c9b5bbcf4e73d9657e83313238dda9b90
 
 ## ✨ Key Features
 
