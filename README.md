@@ -1,3 +1,43 @@
+# 🧪 QA Technical Assessment — Linte
+
+**Candidato:** Rafael Barbosa  
+**Vaga:** Senior QA / SDET  
+**Empresa:** Linte  
+**Data:** Abril 2026
+
+## 📹 Walkthrough em Vídeo
+
+> 🎬 **[Assistir ao Walkthrough do Processo de QA no Google Drive](YOUR_GOOGLE_DRIVE_LINK_HERE)**
+
+## 📦 Artefatos de QA
+
+| Artefato | Descrição |
+|---|---|
+| [`Docs/system-overview.md`](Docs/system-overview.md) | Documentação do sistema e arquitetura |
+| [`Docs/test-plan.md`](Docs/test-plan.md) | Plano de testes com 51 casos documentados |
+| [`e2e/`](e2e/) | Suite Playwright com 20 testes automatizados |
+| [GitHub Issues](../../issues) | 4 bugs/melhorias identificados |
+
+## ✅ Resultados
+
+- **20/20 testes passando** localmente e no GitHub Actions CI
+- **Pipeline:** `.github/workflows/playwright.yml`
+
+## 🚀 Como Rodar os Testes
+
+```bash
+# 1. Subir a aplicação
+pnpm install && pnpm dev
+
+# 2. Rodar a suite (em outro terminal)
+cd e2e
+pnpm install
+npx playwright install chromium
+npx playwright test --headed
+```
+
+---
+
 # Negotiation Tracker
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
