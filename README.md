@@ -7,7 +7,7 @@
 
 ## 📹 Walkthrough em Vídeo
 
-> 🎬 **[Assistir ao Walkthrough do Processo de QA no Google Drive](YOUR_GOOGLE_DRIVE_LINK_HERE)**
+> 🎬 **[Assistir ao Walkthrough do Processo de QA no Google Drive](https://drive.google.com/file/d/1Nyxhb-l6qRtKdM1JC3obWbizkPLHocTN/view?usp=sharing)**
 
 ## 📦 Artefatos de QA
 
