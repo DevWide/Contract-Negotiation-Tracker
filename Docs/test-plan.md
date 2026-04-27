@@ -1,151 +1,154 @@
-# Plano de Testes — Contract Negotiation Tracker
+# Test Plan — Contract Negotiation Tracker
 
-**Projeto:** Contract Negotiation Tracker  
-**Preparado por:** Rafael Barbosa  
-**Data:** Abril 2026  
-**Ferramenta:** Playwright (E2E)  
-**Ambiente:** localhost:3000 (pnpm dev)
-
----
-
-## 1. Escopo
-
-Este plano de testes cobre os testes funcionais end-to-end do Contract Negotiation Tracker. Como a aplicação não possui backend, o escopo de testes foca em:
-
-- Interações de UI e fluxos de usuário
-- Gerenciamento e persistência do estado no localStorage
-- Integridade dos dados entre operações (criar, editar, deletar)
-- Funcionalidades de comparação visual e diff
-- Integração entre módulos (ex: filtros do dashboard refletindo estados das cláusulas)
-
-**Fora do escopo (v1):**
-- Testes de performance/carga
-- Auditoria de acessibilidade (WCAG)
-- Testes mobile/responsivo
-- Edge cases de importação DOCX/PDF
+**Project:** Contract Negotiation Tracker  
+**Prepared by:** Rafael Barbosa  
+**Date:** April 2026  
+**Tool:** Playwright (E2E)  
+**Environment:** localhost:3000 (pnpm dev)
 
 ---
 
-## 2. Estratégia de Testes
+## 1. Scope
 
-### 2.1 Abordagem
+This test plan covers end-to-end functional testing of the Contract Negotiation Tracker SPA. Since the application has no backend, test scope focuses on:
 
-Dado que a arquitetura é localStorage-only, o risco principal é a **corrupção de estado** — dados que não persistem corretamente, estado que vaza entre contratos, ou UI que diverge dos dados armazenados. A suite de testes prioriza:
+- UI interactions and user flows
+- localStorage state management and persistence
+- Data integrity across operations (create, edit, delete)
+- Visual diff and comparison features
+- Cross-module integration (e.g., dashboard filters reflecting clause states)
 
-1. **Fluxos happy path** — jornadas principais do usuário devem funcionar end-to-end
-2. **Persistência de estado** — dados sobrevivem ao reload da página
-3. **Isolamento de estado** — limpar o storage reseta o app para estado vazio
-4. **Consistência UI ↔ Dados** — contadores do dashboard refletem status reais das cláusulas
-5. **Edge cases** — estados vazios, textos longos, caracteres especiais
+**Out of scope (v1):**
+- Performance/load testing (no backend)
+- Accessibility audit (WCAG)
+- Mobile/responsive testing
+- DOCX/PDF import parsing edge cases
 
-### 2.2 Estratégia de Isolamento de Testes
+---
 
-Cada suite limpa o localStorage antes da execução via `page.evaluate(() => localStorage.clear())` + reload da página. Isso garante independência entre os testes sem necessidade de teardown de banco de dados.
+## 2. Test Strategy
 
-### 2.3 Ferramentas
+### 2.1 Approach
 
-| Ferramenta | Propósito |
+Given the localStorage-only architecture, the primary risk is **state corruption** — data that doesn't persist correctly, state that leaks between contracts, or UI that diverges from stored data. The test suite prioritizes:
+
+1. **Happy path flows** — core user journeys must work end-to-end
+2. **State persistence** — data survives page reload
+3. **State isolation** — clearing storage resets the app to empty state
+4. **UI ↔ Data consistency** — dashboard counters match actual clause statuses
+5. **Edge cases** — empty states, long text, special characters
+
+### 2.2 Test Isolation Strategy
+
+Each test suite clears localStorage before execution via Playwright's `page.evaluate(() => localStorage.clear())` + page reload. This guarantees test independence without a database teardown step.
+
+### 2.3 Tooling
+
+| Tool | Purpose |
 |---|---|
-| Playwright | Automação de browser E2E |
-| Page Object Model | Camada de abstração para seletores de UI |
-| Playwright Fixtures | Setup/teardown do localStorage |
-| GitHub Actions | Execução em CI a cada push |
+| Playwright | E2E browser automation |
+| Page Object Model | Abstraction layer for UI selectors |
+| Playwright Fixtures | localStorage setup/teardown |
+| GitHub Actions | CI execution on every push to main |
 
 ---
 
-## 3. Suites de Testes
+## 3. Test Suites
 
 ### Suite 01 — Contract CRUD (`01-contract-crud.spec.ts`)
 
-**Prioridade:** Crítica
+**Priority:** Critical  
+**Risk area:** Core data creation and persistence
 
-| ID | Caso de Teste | Tipo |
+| ID | Test Case | Type |
 |---|---|---|
-| TC-01 | Criar novo contrato com todos os campos obrigatórios | Happy path |
-| TC-03 | Contrato aparece no dropdown do header após criação | Integração |
-| TC-06 | Dados do contrato persistem após reload da página | Persistência |
-| TC-08 | Switch de ball-in-court alterna entre "Ball with Us" e "Ball with Them" | Happy path |
-| TC-08b | Estado do ball-in-court persiste após reload | Persistência |
-| TC-09 | Alternar entre contratos carrega os dados corretos | Isolamento |
-| TC-44 | Chave localStorage é populada ao carregar o app | Técnico |
+| TC-01 | Create a new contract with all required fields | Happy path |
+| TC-03 | New contract appears in header dropdown after creation | Integration |
+| TC-06 | Contract data persists after page reload | Persistence |
+| TC-08 | Ball-in-court switch toggles between "Ball with Us" and "Ball with Them" | Happy path |
+| TC-08b | Ball-in-court toggle state persists after reload | Persistence |
+| TC-09 | Switching between contracts loads correct data | Isolation |
+| TC-44 | localStorage key is populated on app load | Technical |
 
 ---
 
-### Suite 02 — Gestão de Cláusulas (`02-clause-management.spec.ts`)
+### Suite 02 — Clause Management (`02-clause-management.spec.ts`)
 
-**Prioridade:** Crítica
+**Priority:** Critical  
+**Risk area:** 3-text model integrity, inline editing
 
-| ID | Caso de Teste | Tipo |
+| ID | Test Case | Type |
 |---|---|---|
-| TC-10 | Adicionar cláusula com os três campos de texto preenchidos | Happy path |
-| TC-12 | Cláusula aparece na tabela após criação | Happy path |
-| TC-16 | Dados da cláusula persistem após reload da página | Persistência |
-| TC-17 | Formulário fecha após criação bem-sucedida de cláusula | UX |
-| TC-18 | Atalho Ctrl+N abre o formulário de nova cláusula | UX |
-| TC-19 | Busca filtra a tabela de cláusulas por texto | Funcional |
-| TC-19b | Limpar busca restaura a lista completa de cláusulas | Funcional |
+| TC-10 | Add a clause with all three text fields populated | Happy path |
+| TC-12 | Clause appears in table after creation | Happy path |
+| TC-16 | Clause data persists after page reload | Persistence |
+| TC-17 | Form closes after successful clause creation | UX |
+| TC-18 | Ctrl+N keyboard shortcut opens new clause form | UX |
+| TC-19 | Search filters clause table by text | Functional |
+| TC-19b | Clearing search restores full clause list | Functional |
 
 ---
 
-### Suite 06 — Persistência localStorage (`06-persistence.spec.ts`)
+### Suite 06 — localStorage Persistence (`06-persistence.spec.ts`)
 
-**Prioridade:** Crítica
+**Priority:** Critical  
+**Risk area:** Only persistence mechanism — failure means total data loss
 
-| ID | Caso de Teste | Tipo |
+| ID | Test Case | Type |
 |---|---|---|
-| TC-42 | Contratos demo presentes no carregamento inicial | Persistência |
-| TC-43 | Cláusula criada pelo usuário persiste após reload | Persistência |
-| TC-44 | Chave negotiation-tracker-contracts existe no localStorage | Técnico |
-| TC-44b | Dados do localStorage têm estrutura JSON válida | Técnico |
-| TC-46 | Múltiplas cláusulas persistem após reload | Persistência |
-| TC-47 | Estado do ball-in-court persiste após reload | Persistência |
+| TC-42 | Demo contracts are present on fresh load | Persistence |
+| TC-43 | User-created clause persists after full reload | Persistence |
+| TC-44 | negotiation-tracker-contracts key exists in localStorage | Technical |
+| TC-44b | localStorage contracts have valid JSON structure | Technical |
+| TC-46 | Multiple clauses all persist after reload | Persistence |
+| TC-47 | Ball-in-court state persists after reload | Persistence |
 
 ---
 
-## 4. Priorização por Risco
+## 4. Risk-Based Prioritization
 
-| Risco | Impacto | Probabilidade | Prioridade |
+| Risk | Impact | Likelihood | Priority |
 |---|---|---|---|
-| Perda de dados no localStorage ao limpar browser | Alto | Alto | P1 |
-| Contadores do dashboard fora de sincronia com cláusulas | Alto | Médio | P1 |
-| Dados do modelo de 3 textos não salvos corretamente | Alto | Baixo | P1 |
-| Restauração de versão sobrescrevendo cláusula errada | Alto | Baixo | P1 |
-| Modal de comparação mostrando par de diff incorreto | Médio | Médio | P2 |
-| Edição inline não persistindo | Médio | Médio | P2 |
-| Falha no parsing de importação de template | Baixo | Médio | P3 |
+| localStorage data loss on browser clear | High | High | P1 |
+| Dashboard counters out of sync with clauses | High | Medium | P1 |
+| 3-text model data not saved correctly | High | Low | P1 |
+| Version restore overwrites wrong clause | High | Low | P1 |
+| Comparison modal showing wrong diff pair | Medium | Medium | P2 |
+| Inline edit not persisting | Medium | Medium | P2 |
+| Template import parsing failure | Low | Medium | P3 |
 
 ---
 
-## 5. Critérios de Entrada e Saída
+## 5. Entry & Exit Criteria
 
-**Critérios de entrada:**
-- Aplicação rodando localmente em `http://localhost:3000`
-- `pnpm dev` inicia sem erros
-- Playwright instalado e configurado
+**Entry criteria:**
+- Application runs locally on `http://localhost:3000`
+- `pnpm dev` starts without errors
+- Playwright installed and configured
 
-**Critérios de saída:**
-- Suites 01, 02 e 06 passando (prioridade crítica)
-- Nenhum bug P1 em aberto
-- Todos os testes de persistência verdes
+**Exit criteria:**
+- Suites 01, 02 and 06 passing (critical priority)
+- No P1 bugs open
+- All persistence tests green
 
 ---
 
-## 6. Ambiente de Testes
+## 6. Test Environment
 
-- SO:          macOS (Apple Silicon M4)
+- OS:          macOS (Apple Silicon M3)
 - Node:        22.x
 - pnpm:        10.4.1
-- Browser:     Chromium (padrão Playwright)
+- Browser:     Chromium (Playwright default)
 - Base URL:    http://localhost:3000
 - CI:          GitHub Actions (ubuntu-latest)
 
 ---
 
-## 7. Itens Fora do Escopo (Trabalho Futuro)
+## 7. Out-of-Scope Items (Future Work)
 
-- Automação de CRUD do Playbook
-- E2E de importação de templates (DOCX/PDF)
-- Gerenciamento de Configurações / Categorias de Impacto
-- Validação de importação/exportação CSV
-- Regressão visual do modo escuro
-- Cobertura completa de navegação por teclado
+- Playbook CRUD automation
+- Template import (DOCX/PDF) E2E
+- Settings / Impact Categories management
+- CSV import/export validation
+- Dark mode visual regression
+- Full keyboard navigation coverage

@@ -1,40 +1,88 @@
 # 🧪 QA Technical Assessment — Linte
 
-**Candidato:** Rafael Barbosa  
-**Vaga:** Senior QA / SDET  
-**Empresa:** Linte  
-**Data:** Abril 2026
+**Candidate:** Rafael Barbosa  
+**Role:** Senior QA / SDET  
+**Company:** Linte  
+**Date:** April 2026
 
-## 📹 Walkthrough em Vídeo
+---
 
-> 🎬 **[Assistir ao Walkthrough do Processo de QA no Google Drive](https://drive.google.com/file/d/1Nyxhb-l6qRtKdM1JC3obWbizkPLHocTN/view?usp=sharing)**
+## 📹 Video Walkthrough
 
-## 📦 Artefatos de QA
+> 🎬 **[Watch the QA Process Walkthrough on Google Drive](https://drive.google.com/file/d/1Nyxhb-l6qRtKdM1JC3obWbizkPLHocTN/view?usp=sharing)**
 
-| Artefato | Descrição |
+---
+
+## 📦 QA Artifacts
+
+| Artifact | Description |
 |---|---|
-| [`Docs/system-overview.md`](Docs/system-overview.md) | Documentação do sistema e arquitetura |
-| [`Docs/test-plan.md`](Docs/test-plan.md) | Plano de testes com 51 casos documentados |
-| [`e2e/`](e2e/) | Suite Playwright com 20 testes automatizados |
-| [GitHub Issues](../../issues) | 4 bugs/melhorias identificados |
+| [`Docs/system-overview.md`](Docs/system-overview.md) | System documentation and architecture |
+| [`Docs/test-plan.md`](Docs/test-plan.md) | Test plan with 51 documented test cases |
+| [`e2e/`](e2e/) | Playwright E2E suite with 20 automated tests |
+| [GitHub Issues](../../issues) | 4 bugs/enhancements identified during testing |
 
-## ✅ Resultados
+---
 
-- **20/20 testes passando** localmente e no GitHub Actions CI
+## ✅ Results
+
+- **20/20 tests passing** locally and on GitHub Actions CI
 - **Pipeline:** `.github/workflows/playwright.yml`
 
-## 🚀 Como Rodar os Testes
+---
+
+## 🚀 How to Run the Tests
 
 ```bash
-# 1. Subir a aplicação
+# 1. Start the application
 pnpm install && pnpm dev
 
-# 2. Rodar a suite (em outro terminal)
+# 2. Run the suite (in a second terminal)
 cd e2e
 pnpm install
 npx playwright install chromium
 npx playwright test --headed
 ```
+
+---
+
+## 🧠 Key Technical Decisions
+
+### Why Playwright?
+- Native TypeScript support
+- Direct localStorage access via `page.evaluate()` — essential for this app
+- Built-in auto-wait reduces flakiness on React state updates
+- Integrated test runner, no additional configuration needed
+
+### localStorage Isolation Strategy
+Since the app has no backend, test isolation is achieved by clearing all `negotiation-tracker-*` keys from localStorage before each test via a custom Playwright fixture. This guarantees every test starts from a clean state.
+
+### Page Object Model
+All selectors are encapsulated in Page Objects. Tests read as behavioral specifications, not automation code.
+
+### AI Tooling
+Claude was used throughout this process as a support tool for:
+- System analysis from README and UI screenshots
+- Test case ideation based on domain and risk mapping
+- Page Object and fixture boilerplate generation
+- Every generated output was reviewed, adapted to real UI selectors, and validated against the running application
+
+---
+
+## 📊 Test Coverage
+
+| Suite | Test Cases | Priority |
+|---|---|---|
+| 01 — Contract CRUD | 7 | Critical |
+| 02 — Clause Management | 7 | Critical |
+| 06 — localStorage Persistence | 6 | Critical |
+| **Total** | **20** | |
+
+---
+
+## 🐛 Issues Found
+
+Bugs and improvements identified during testing are documented in the [GitHub Issues](https://github.com/DevWide/Contract-Negotiation-Tracker/issues) of this repository.
 
 ---
 
